@@ -1,0 +1,1033 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+   <!-- 피드경로 명시 -->
+  <channel>
+    <title> SEIL KANG  </title>
+    <description>Personal portfolio/Diary</description>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000https://junia3.github.io/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Tue, 23 May 2023 19:39:26 +0900</pubDate>
+    <lastBuildDate>Tue, 23 May 2023 19:39:26 +0900</lastBuildDate>
+    <generator>Jekyll v4.3.2</generator>
+    
+      <item>
+        <title>Decompose, Adjust, Compose - Effective Normalization by Playing with Frequency for Domain Generalization</title>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;연세대학교&lt;/code&gt;에서 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;CVPR2023&lt;/code&gt;에 게재한 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Decompose, Adjust, Compose: Effective Normalization by Playing with Frequency for Domain Generalization&lt;/code&gt; 를 읽고 작성한 논문 리뷰입니다.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;abstract&quot;&gt;Abstract&lt;/h2&gt;
+
+&lt;p&gt;논문의 abstract에서는 다음과 같은 &lt;strong&gt;세 가지 Main Points&lt;/strong&gt; 를 강조합니다:&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;1. 콘텐츠(Content)과 스타일(Style)의 구분&lt;/strong&gt;: 컴퓨터 비전에서 Domain Generalization(도메인 일반화, DG)에 대한 이전 연구들은 스타일과 콘텐츠을 구분하기 위해 정규화(Normalization) 기법을 사용해왔습니다. 그러나 이 방법을 사용하여 스타일을 제거하면 콘텐츠의 변동 문제가 발생합니다. 왜냐하면 콘텐츠과 스타일 사이의 경계가 명확하게 정의되지 않기 때문입니다. 이 논문은 진폭을 스타일, 위상을 콘텐츠으로 고려하는 주파수 영역 관점에서 이 문제를 해결합니다.&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+&lt;img alt=&quot;&quot; src=&quot;https://seilk.github.io/assets/img/paperreview/pcnorm3.jpg&quot; width=&quot;500&quot; /&gt;
+&lt;img alt=&quot;&quot; src=&quot;https://seilk.github.io/assets/img/paperreview/pcnorm4.png&quot; width=&quot;400&quot; /&gt;
+&lt;em&gt;Content &amp;amp; Style : Content는 이미지의 Object label을 의미하고 Style은 그 이미지의 표현 양식을 의미한다. 
+예를 들어서 위 사진들은 같은 호랑이 content 사진이지만 &lt;code&gt;왼쪽&lt;/code&gt; 사진은 &lt;code&gt;Real style&lt;/code&gt;이고 &lt;code&gt;오른쪽&lt;/code&gt; 사진은 &lt;code&gt;Cartoon style&lt;/code&gt;이라고 할 수 있다.&lt;/em&gt;&lt;br /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;2. 새로운 정규화 방법&lt;/strong&gt;: 이 논문에서는 &lt;u&gt;PCNorm&lt;/u&gt;이라는 새로운 정규화 방법을 제안합니다. 이 방법은 스펙트럼 분해(Spectral decomposition)를 통해 스타일을 제거하면서 콘텐츠을 보존합니다. 푸리에 변환 공식(Fourier Transform, FT)으로부터 유도된 정규화의 양적 위상 변동(quantitative phase variation of normalization)을 기반으로 PCNorm은 콘텐츠과 스타일을 효과적으로 분리합니다.&lt;/p&gt;
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/pcnorm1.jpg&quot; width=&quot;700&quot; /&gt;
+&lt;em&gt;Spectral Decompose 기반의 DG 방법론에서 (a)와 같은 기존의 Normalization은 Output에서 Content 손실이 일어난다. 반면 (b)와 같이 저자들의 방법으로 Normalization을 하게 되면 Content 손실 없이 스타일을 제거한 Output을 얻을 수 있다.&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;
+&lt;strong&gt;3. 고급 Variants과 모델&lt;/strong&gt;: 논문은 PCNorm의 고급 변형인 CCNorm과 SCNorm을 소개합니다. 이러한 Variants은 콘텐츠과 스타일의 변동 정도를 조절할 수 있어 DG에 대한 도메인에 중립적인 표현 학습을 가능하게 합니다. 또한, 이 논문은 제안된 정규화 방법을 통합한 ResNet 변형 모델인 &lt;u&gt;DAC-P&lt;/u&gt;와 &lt;u&gt;DAC-SC&lt;/u&gt;를 소개합니다. 이러한 모델은 Domain gap에 대한 Robustness을 나타내며, 기존의 DG 방법보다 우수한 성능을 보입니다. DAC-SC 모델은 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PACS&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VLCS&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Ofﬁce-Home&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;DomainNet&lt;/code&gt; 및 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;TerraIncognita&lt;/code&gt;라는 다섯 개의 데이터셋에서 평균 65.6%를 달성합니다(&lt;strong&gt;SOTA&lt;/strong&gt;).&lt;/p&gt;
+
+&lt;p&gt;요약하면, 이 논문은 Domain Generalization에서의 콘텐츠 변동 문제를 해결하기 위해 새로운 정규화 방법(PCNorm)과 PCNorm의 고급 변형(CCNorm 및 SCNorm)을 제안합니다. 이러한 방법을 통합한 모델은 기존의 DG 접근 방식보다 Domain gap에 대한 Robustness가 향상되는 성능을 보여줍니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;컴퓨터비젼의 딥러닝은 각종 Tasks에서 우수한 성과를 달성하고 있지만 테스트 데이터에서 Domain shift가 발생하는 경우 성능이 저하됩니다. 현실세계에서 이미지 스타일의 변화(Domain Shift)가 일어나더라도 인간의 시각 시스템은 이미지를 잘 구별하고 인식합니다. 하지만  학습 및 테스트 데이터셋이 동일하고 독립적으로 분포되었다고 가정하면, 인간의 시각 시스템만큼 딥러닝 모델은 견고하지 않습니다.&lt;/p&gt;
+
+&lt;p&gt;도메인 일반화(Domain Generalization, DG)는 이 문제를 해결하기 위해 소스 도메인과 학습 중에 본 적 없는 타겟 도메인 간의 격차에 강건한 모델을 학습하는 것을 목표로 합니다. 또한, DG는 도메인과 관련없는 표현을 Supervised 되지 않은 방식으로 학습해야 해서 어렵습니다.&lt;/p&gt;
+
+&lt;p&gt;Style-based 접근 방법은 DG에 대해 널리 연구되었으며, 스타일의 차이로 도메인 갭을 정의합니다. 일반적으로 Style transfer에서 잘 알려진 정규화 방법인 배치 정규화(Batch Normalization, BN), 레이어 정규화(Layer Normalization, LN), 및 인스턴스 정규화(Instance Normalization, IN)과 같은 정규화 방법이 이 접근 방법에서 사용됩니다. 정규화 통계는 스타일 정보를 포함하며, 정규화는 특징에서 스타일을 성공적으로 추출할 수 있습니다. &lt;strong&gt;그러나 이렇게 스타일을 조작하여 소멸시킬때 이미지의 콘텐츠 또한 변경됩니다.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;스타일 기반 DG의 다른 방법은 &lt;u&gt;Frequency domain-based (주파수 도메인 기반)&lt;/u&gt; 방법입니다. Input 이미지는 푸리에 변환(Fourier transform, FT) 을 사용하여 진폭(Amplitude)과 위상(Phase)으로 분해됩니다. &lt;strong&gt;이 때 진폭과 위상은 각각 입력 이미지의 스타일과 콘텐츠으로 간주됩니다.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;각 구성 요소는 독립적으로 조작되어 스타일 변환된 이미지를 생성합니다. 이 방법은 스타일과 콘텐츠를 분리할 수 있다는 장점을 가지고 있습니다. 그러나 이전 Work들은 DG를 위해 Input-level data augmentation(입력 수준 데이터 증강)에만 적용되었습니다.&lt;/p&gt;
+
+&lt;p&gt;따라서, &lt;strong&gt;Input-level이 아닌 Feature-level&lt;/strong&gt;에서도 적용 가능한 경우, Frequency domain-based 방법은 DG에 도움이 되는 Normalization과 상호-보완적으로 작용할 것으로 예상했습니다.&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/pcnorm2.jpg&quot; width=&quot;700&quot; /&gt;
+&lt;em&gt;AdaIN에서 Normalization 기법을 저자들의 방법으로 대체했을때 저자들의 방법들이 Style을 잘 분리한다는 것을 알아냈다.&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;p&gt;저자들은 이 가능성을 확인하기 위해 Style transfer experiment(스타일 전이 실험)을 수행했습니다.(위 사진 참고) Style transfer에서 정규화를 사용하는 기념비적인(Milestone) 작업인 ‘AdaIN’에서 ‘IN’을 spectral decomposition(스펙트럼 분해)로 대체하였습니다. 그 quantitative results는 frequency domain-based 방법이 정규화 대신 특성 수준의 스타일-콘텐츠 분리기로 작동할 수 있다는 것을 보여줍니다.&lt;/p&gt;
+
+&lt;p&gt;이를 바탕으로, 논문에서는 정규화(Normalization)와 스펙트럼 분해(Spectral decomposition)를 결합하여 정규화에서 발생하는 콘텐츠 변경 or 손실 문제를 해결하고자 합니다.&lt;/p&gt;
+
+&lt;p&gt;저자들은 Frequency domain-based(주파수 도메인 기반)의 관점에서 DG에서 기존의 정규화의 효과를 조사했습니다. 논문에는 정규화가 특성의 콘텐츠를 어떻게 변형시키는지 FT(푸리에 변환) 공식을 수학적으로 유도함으로써 확인했습니다. (이는 이러한 분석을 처음으로 제시한 것입니다.)&lt;/p&gt;
+
+&lt;p&gt;그런 다음, 이 분석을 기반으로, 우리는 새로운 정규화 방법인 &lt;u&gt;Phase-Consistent Normalization&lt;/u&gt;(Phase가 일관적인 정규화, PCNorm)을 소개합니다.&lt;/p&gt;
+
+&lt;p&gt;PCNorm은 pre-normalized feature(정규화 이전의 특성)의 위상(phase)과 post-normalized feature(정규화 이후의 특성) 진폭(amplitude)을 조합하여 내용이 불변한 정규화된 특성을 합성한다. 실험 결과는 기존의 정규화에 비해 DG에서 PCNorm이 DG 성능에 좋은 효과가 있음을 나타냅니다.&lt;/p&gt;
+
+&lt;p&gt;논문에서는 더 나아가서 PCNorm의 성공을 기반으로, 두 가지 고급 PCNorm 변형인 &lt;u&gt;Content-controlling normalization&lt;/u&gt;(콘텐츠 제어 정규화, CCNorm)와 &lt;u&gt;Style-controlling normalization&lt;/u&gt;(스타일 제어 정규화, SCNorm)을 제안했습니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;u&gt;두 방법의 주요 아이디어는 콘텐츠나 스타일을 보존하는 것이 아니라 그 변화를 조절(Control)하는 것입니다.&lt;/u&gt; CCNorm과 SCNorm은 각각 콘텐츠와 스타일의 변화를 조절하기 때문에 DG의 더 견고한 표현을 합성할 수 있다고 주장합니다.&lt;/p&gt;
+
+&lt;p&gt;저자들이 주장하는 논문의 Contribution은 다음과 같습니다:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;ol&gt;
+    &lt;li&gt; 처음으로, 우리는 수학적 유도를 통해 정규화로 인한 위상의 양적 변화(quantitative phase variation of normalization)를 분석했습니다. &lt;/li&gt;
+
+    &lt;li&gt; 저자들은 스펙트럼 분해를 통해 스타일을 제거할 수 있는 새로운 정규화 방법인 PCNorm을 소개했습니다. &lt;/li&gt;
+
+    &lt;li&gt; 저자들은 고급 PCNorm 변형으로 CCNorm과 SCNorm이라는 제안했습니다. 이들은 각각 콘텐츠와 스타일의 변화 정도를 조절하여 DG에 대한 도메인-무관한 특징을 학습할 수 있습니다. &lt;/li&gt;
+
+    &lt;li&gt; 저자들은 PCNorm을 적용한 ResNet 변형 모델인 DAC-P와 CCNorm 및 SCNorm을 적용한 주요 모델인 DAC-SC를 제안했습니다. 
+    우리는 PACS, VLCS, Ofﬁce-Home, DomainNet 및 TerraIncognita라는 다섯 가지 DG 벤치마크에서 DAC-P와 DAC-SC를 평가했으며, 
+    DAC-P는 65.1%의 평균 성능으로 다른 최근 DG 방법들을 능가했습니다.  &lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;더욱이, 주요 모델인 DAC-SC는 65.6%의 평균 최고 성능을 달성하며, PACS, Ofﬁce-Home 및 DomainNet 벤치마크에서 각각 87.5%, 70.3% 및 44.9%의 가장 높은 성능을 보여줍니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;related-works&quot;&gt;Related Works&lt;/h1&gt;
+
+&lt;h2 id=&quot;1-domain-invariant-learning-for-dg&quot;&gt;1. Domain-Invariant Learning for DG&lt;/h2&gt;
+
+&lt;p&gt;DG(Domain Generalization) 방법은 도메인-불변 특징(Domain-Invariant feature)을 학습하기 위해 다양한 접근 방식이 개발되었습니다.&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;적대적 학습 방법(Adversarial learning methods)은 적대적 훈련을 통해 모델이 도메인 특정 표현에 Overfitting되지 않도록 합니다.&lt;/li&gt;
+  &lt;li&gt;정규화 방법(Regularization Methods)은 손실 함수(Loss function) 재정의, Gradient-based Dropout, 대조 학습(Contrastive Learning)과 같은 다양한 정규화 전략을 사용하여 도메인-불변 학습을 합니다.&lt;/li&gt;
+  &lt;li&gt;최적화 방법(Optimization methods)은 커널 방법과 분산 페널티(Variance penalties)와 같은 기법을 사용하여 분포적 분산(Distributional variance)과 Domain-specific difference를 줄이는 데 집중합니다. Meta-learning 방법은 소스 데이터셋의 다양한 분할로 훈련 및 테스트하여 다양한 도메인 변화를 시뮬레이션하고 DG 성능을 향상시킵니다.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;2-style-based-learning-for-dgdg를-위한-style-based-learning&quot;&gt;2. Style-Based Learning for DG(DG를 위한 Style-Based Learning)&lt;/h2&gt;
+
+&lt;p&gt;Style-Based Learning 방법은 도메인 간의 스타일 차이를 고려하여 스타일에 불변한 특징을 추출하기 위해 도메인 간의 차이를 다룹니다. 정규화(Normalization)와 주파수 도메인 기반 방법(Frequency domain based methods)이 두 가지 일반적으로 사용되는 기술입니다.&lt;/p&gt;
+
+&lt;p&gt;그 중에서 정규화 방법은 특징에서 스타일 정보를 걸러내기 위해 널리 사용됩니다. 배치 정규화(BN), 인스턴스 정규화(IN) 또는 둘 다를 사용하여 DG에 적용되었습니다. 그러나 정규화는 콘텐츠 정보의 손실을 초래할 수 있다는 것이 관찰되었습니다.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;주파수 도메인 기반 방법에서 이미지의 스타일과 콘텐츠는 주파수 도메인에서의 진폭(Amplitude)과 위상(Phase)으로 표현됩니다. 이러한 방법은 진폭과 위상을 조작하여 모델의 분포 변화에 대한 Robustness를 향상시킵니다. 예를 들어, 스펙트럴 전이는 소스 진폭의 저주파수 성분을 대상 진폭에 전달합니다. 진폭 교환(Amplitude Swap, AS) 및 진폭 혼합(Amplitude Mix, AM) 전략은 데이터 Augmentation을 위해 소스 및 타겟 도메인의 진폭을 swap하거나 mix하는 방식입니다.&lt;/p&gt;
+
+&lt;p&gt;일부 연구에서는 소스 도메인의 진폭과 위상에 가우시안 노이즈를 적용하는 방법도 사용됩니다. 대부분의 기존 주파수 기반 방법은 Input 단의 데이터 Augmentation에 초점을 맞추고 있습니다. 반면, 이 논문에서는 Feature level에서 적용 가능한 새로운 주파수 도메인 기반 정규화 방법을 소개합니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;analysis&quot;&gt;Analysis&lt;/h2&gt;
+
+&lt;h3 id=&quot;1-spectral-decomposition&quot;&gt;1. Spectral Decomposition&lt;/h3&gt;
+
+&lt;p&gt;“Spectral decomposition” 이라는 말은 한국말로 “스펙트럼 분해”라고 할 수 있으며 &lt;strong&gt;이산 푸리에 변환(Discrete Fourier transform , DFT)&lt;/strong&gt;을 사용해서 feature를 진폭(amplitude)과 위상(phase) 요소로 특징을 분해하는 과정을 의미합니다.&lt;/p&gt;
+
+&lt;p&gt;DFT transfoms는 입력값의 공간적(spatial) 특징인 $f \in \mathbb{R}^{h\times w}$ 를 주파수(frequency) 특징인 
+$\mathcal{F } \in \mathbb{R}^{h \times w}$ 로 변환시키는 것입니다.&lt;/p&gt;
+
+&lt;p&gt;[
+    \mathcal{F}(u, v)=\frac{1}{w h} \sum_{x=0}^{w-1} \sum_{y=0}^{h-1} f(x, y) \exp({i 2 \pi(\frac{u x}{w}+\frac{v y}{h})})= \mathcal{F}_{real}(u, v) + i\mathcal{F}_{img}(u, v) 
+]&lt;/p&gt;
+
+&lt;p&gt;위 식에서 $i$ 는 imaginary unit(복소수 단위)입니다. $\mathcal{F}_{\text {real }}(u, v)$ 와 $\mathcal{F}_{i m g}(u, v)$ 는 각각 $\mathcal{F}(u, v)$의 실수 부분과 허수 부분입니다.&lt;/p&gt;
+
+&lt;p&gt;이는 아래의 식으로 다시 표현할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;[
+\begin{aligned}
+&amp;amp; \mathcal{F}_{r e a l}(u, v)=\frac{1}{w h} \sum_{x=0}^{w-1} \sum_{y=0}^{h-1} f(x, y) \cos 2 \pi (\frac{u x}{w}+\frac{v y}{h} ), &lt;br /&gt;
+&amp;amp; \mathcal{F}_{i m g}(u, v)=\frac{1}{w h} \sum_{x=0}^{w-1} \sum_{y=0}^{h-1} f(x, y) \sin 2 \pi (\frac{u x}{w}+\frac{v y}{h} )
+\end{aligned}
+]&lt;/p&gt;
+
+&lt;p&gt;이 과정에서 spatial feature $f$ 는 진폭(amplitude, $\alpha$)과 위상(pahse, $\rho$)로 decompose된다고 볼 수 있으며 $\alpha$와 $\rho$는 다음과 같은 식으로 계산 될 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;[
+\begin{aligned}
+&amp;amp; \alpha=\sqrt{\mathcal{F}_{\text {real }}^2+\mathcal{F}_{\text {img }}^2}, &lt;br /&gt;
+&amp;amp; \rho=\arctan \frac{\mathcal{F}_{i m g}}{\mathcal{F}_{\text {real }}}
+\end{aligned}
+]&lt;/p&gt;
+
+&lt;p&gt;뿐만 아니라 $\mathcal{F}$는 $\alpha$와 $\rho$로 부터 다시 reassemble 될 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;[
+\mathcal{F}=\alpha \cos (\rho)+i \alpha \sin (\rho)
+]&lt;/p&gt;
+
+&lt;p&gt;논문에서 feature를 frequency 좌표축으로 disassembling 하는 것을 &lt;strong&gt;Decompose&lt;/strong&gt;라고 하고 그 반대로 다시 묶는 것을 &lt;strong&gt;Compose&lt;/strong&gt;라고 부릅니다. 이를 수식으로 표현하면 다음과 같습니다.&lt;/p&gt;
+
+&lt;p&gt;[
+\begin{aligned}
+&amp;amp; \alpha, \rho=\operatorname{decompose}(\mathcal{F}) &lt;br /&gt;
+&amp;amp; \mathcal{F}=\operatorname{compose}(\alpha, \rho)
+\end{aligned}
+]&lt;/p&gt;
+
+&lt;h3 id=&quot;2-content-variation-by-normalization&quot;&gt;2. Content Variation by Normalization&lt;/h3&gt;
+
+&lt;p&gt;앞 목차에서 DFT를 수식적인 부분을 통해 자세히 살펴 보았고 결국 공간적인 feature는 주파수적인 feature로 변환(transform)될 수 있고 공간적인 feature는 다시 한번 $\alpha$와 $\rho$로 표현되는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;진폭&lt;/code&gt;과 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;위상&lt;/code&gt;으로 decomposition 된다는 것을 알았습니다.&lt;/p&gt;
+
+&lt;p&gt;이번 목차에서는 기존의 정규화 방법(Existing Normalization)이 feature의 contents를 바꿔버리는 것을 수학적으로 증명합니다.&lt;/p&gt;
+
+&lt;p&gt;우선 normalized feature인 $f^{n o r m} \in  \mathbb{R}^{h\times w} $은 다음과 같이 표현됩니다.&lt;/p&gt;
+
+&lt;p&gt;[
+f^{n o r m}=\frac{f-\mu}{\sigma}
+]&lt;/p&gt;
+
+&lt;p&gt;$\mu$ 와 $\sigma$는 f의 통계학적인 평균(mean)과 표준편차(standard deviation)을 의미합니다.&lt;/p&gt;
+
+&lt;p&gt;증명을 위해서 $\mu$ 와 $\sigma$를 상수(constant)로 둡니다.(채널 안에서 같은 방법으로 계산되기 때문입니다.)&lt;/p&gt;
+
+&lt;p&gt;이전 수식을 따르면 봤듯이 $f^{n o r m}$의 DFT는 다음과 같습니다.&lt;/p&gt;
+
+&lt;p&gt;[
+\mathcal{F}^{\text {norm }}(u, v)=\mathcal{F}_{\text {real }}^{\text {norm }}(u, v)+i \mathcal{F}_{\text {img }}^{\text {norm }}(u, v)
+]&lt;/p&gt;
+
+&lt;p&gt;푸리에 변환은 선형속성(linear property)을 가지므로 $\mathcal{F}_{\text {real }}^{\text {norm }}(u, v)$ 와 $\mathcal{F}_{\text {img }}^{\text {norm }}(u, v)$는 다음과 같이 표현될 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;[
+\begin{aligned}
+&amp;amp; \mathcal{F}_{\text {real }}^{\text {norm }}(u, v)=\frac{1}{w h} \sum_{x=0}^{w-1} \sum_{y=0}^{h-1}{\frac{f(x, y)-\mu}{\sigma}} \cos 2 \pi(\frac{u x}{w}+\frac{v y}{h}), &lt;br /&gt;
+&amp;amp; \mathcal{F}_{\text {img }}^{\text {norm }}(u, v)=\frac{1}{w h} \sum_{x=0}^{w-1} \sum_{y=0}^{h-1}{\frac{f(x, y)-\mu}{\sigma}} \sin 2 \pi(\frac{u x}{w}+\frac{v y}{h})
+\end{aligned}
+]&lt;/p&gt;
+
+&lt;p&gt;그리고 여기서, $\mathcal{F}^\mu$를 정의합니다. 
+$\mathcal{F}^\mu \in \mathbb{C}^{h \times w}$는 $f^\mu \mathbb{R}^{h \times w}$의 frequency feature으로 $f^\mu$는 모든 원소가 $\mu$인 feature입니다.&lt;/p&gt;
+
+&lt;p&gt;그렇다면 $\mathcal{F}_{\text {real }}^\mu$와 $\mathcal{F}_{\text {img }}^\mu$를 $\mathcal{F}^\mu$ 의 실수, 허수부라고 한다면 아래와 같은 식으로 식을 다시 작성할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;[
+\begin{aligned}
+    &amp;amp; \mathcal{F}_{\text {real }}^{\text {norm }}=\frac{\mathcal{F}_{\text {real }}-\mathcal{F}_{\text {real }}^\mu}{\sigma}, &lt;br /&gt;
+    &amp;amp; \mathcal{F}_{\text {img }}^{\text {norm }}=\frac{\mathcal{F}_{i m g}-\mathcal{F}_{i m g}^\mu}{\sigma},
+\end{aligned}
+]&lt;/p&gt;
+
+&lt;p&gt;마찬가지로 $\alpha^{\text{norm }}$ 과 $\rho^{\text{norm }}$ 위의 식과 마찬가지로 표현하자면
+아래와 같습니다.&lt;/p&gt;
+
+&lt;blockquote&gt; $\alpha^{\text{norm }}$ : Normalization한 feature에서 decompose 된 '진폭' &lt;br /&gt;
+$\rho^{\text{norm }}$ : Normalization한 feature에서 decompose 된 '위상' &lt;/blockquote&gt;
+
+&lt;p&gt;[
+\begin{aligned}
+\alpha^{\text {norm }} &amp;amp; =\frac{\sqrt{ (\mathcal{F}_{\text {real }}-\mathcal{F}_{\text {real }}^\mu )^2+ (\mathcal{F}_{\text {img }}-\mathcal{F}_{i m g}^\mu )^2}}{\sigma}, &lt;br /&gt;
+\rho^{\text {norm }} =\arctan \frac{\mathcal{F}_{\text {img }}-\mathcal{F}_{i m g}^\mu}{\mathcal{F}_{\text {real }}-\mathcal{F}_{\text {real }}^\mu} .
+\end{aligned}
+]&lt;/p&gt;
+
+&lt;p&gt;자, 이제 수식을 본다면 $\rho^{\text {norm }}$은 $\rho$에 비해 분모 분자에 각각 $\mathcal{F}_{\text {real }}^\mu , \mathcal{F}_{\text {img }}^\mu$의 영향을 받아 값이 바뀌게 됩니다. $rho$는 phase이며 phase는 DG에서 content를 의미합니다.&lt;/p&gt;
+
+&lt;p&gt;위 수식을 DG의 입장에서 재해석 해보면 normalization으로 인해 content information의 numerical variation이 되었다고 할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;추가로 numerical variation이 일어나는 주요 원인은 $\sigma$가 아닌 $\mu$ 라고 할 수 있습니다. 그 이유는 $\rho^{\text {norm }}$은 $(f - \mu)$의 phase라고 할 수 있고 normalization 이후의 phase($\rho^{\text {norm }}$)를 보았을 때 $\sigma$는 수학적으로 영향을 주지 않기 때문이죠.&lt;/p&gt;
+
+&lt;p&gt;정리하자면 단순히 spatial 영역에서 정규화에 의한 평균 이동(mean shift)에 의해 $rho$(위상: content)의 변화가 일어난다고 증명할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;따라서 저자들은 $\mu$를 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;content variation factor&lt;/code&gt;라고 생각합니다. 또한 당연히 $\mu$가 클 수록 content variation은 더 강해집니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;proposed-method&quot;&gt;Proposed Method&lt;/h2&gt;
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/pcnorm5.png&quot; width=&quot;600&quot; /&gt;
+&lt;em&gt;PCNorm, CCNorm, SCNorm의 알고리즘 Pseudocode&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;h3 id=&quot;1-phase-consistent-normalization-pcnorm&quot;&gt;1. Phase Consistent Normalization (PCNorm)&lt;/h3&gt;
+
+&lt;p&gt;앞 내용에서 정규화 과정에서 mean-shift가 문제가 되더라 라는 것을 설명했습니다.
+PCNorm은 normalization때 발생하는 mean-shift를 방지하여 content change를 막아주는 새로운 normalization 기법입니다.&lt;/p&gt;
+
+&lt;p&gt;[
+PCNorm(f) = IFT(compose(\alpha^{norm}, \rho))
+]&lt;/p&gt;
+
+&lt;p&gt;위의 식은 PCNorm의 수식입니다. 푸리에 역변환의 원소로 &lt;strong&gt;post-normalized feature의 진폭($\alpha^{\text{norm}}$)&lt;/strong&gt;과 &lt;strong&gt;pre-normalized feature의 위상($rho$)&lt;/strong&gt;을 교차 사용합니다.&lt;/p&gt;
+
+&lt;p&gt;식을 재해석 해보면 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;위상 == content&lt;/code&gt; 이므로 normalize 이전의 위상을 사용하는 아이디어로 content에 대한 normalize는 하지 않고 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;진폭 == style&lt;/code&gt;에 대한 normalize만을 진행하겠다는 의도입니다.&lt;/p&gt;
+
+&lt;p&gt;이 과정에서 당연히 feature의 위상과 진폭을 분리해야 하기 때문에 DFT의 과정이 들어갑니다.&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/pcnorm6.png&quot; width=&quot;700&quot; /&gt;
+&lt;em&gt;PCNorm, CCNorm, SCNorm의 작업 흐름&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;h3 id=&quot;2-content-controlling-normalization-ccnorm&quot;&gt;2. Content Controlling Normalization (CCNorm)&lt;/h3&gt;
+
+&lt;p&gt;PCNorm에서는 Content의 Normalization을 완전히 배제합니다. 하지만 논문에서는 좀 더 근본적인 질문을 던집니다.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;DG에서 Content의 Variation이 생기는 것이 과연 완전히 부정적이라고만 볼 수 있을까 ?&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;저자들은 이 의문을 해소하기 위해 모델이 스스로 가장 적절한 content의 변화를 배울 수 있도록 만들었습니다. 만약 contents의 change가 DG에 해롭다면 딥러닝 모델은 스스로 조절하는 값을 낮추는 쪽으로 학습되겠죠 ?&lt;/p&gt;
+
+&lt;p&gt;$\lambda^{c} \in \mathbb{R}^2 $ 를 Leanable parameter로 사용함으로써 feature의 mean shift를 조절합니다.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;위의 &lt;em&gt;Analysis&lt;/em&gt; 목차 내의 수식에서 mean($\mu$)에 의한 변화만이 위상(contents, $rho$) 변화량에 영향을 주기 때문에 mean shift를 조절해서 content variation을 조절한다고 말합니다.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Content adjusting terms을 $(\lambda^{c}_{norm}, \lambda^{c}_{org}) = softmax(\lambda^{c}/T_{c})$ 로 표현할 수 있습니다. $T_{c}$는 Temperature value입니다. 각 $\lambda^{c}$들은 각각 normalization과 original contents의 비율을 나타냅니다.&lt;/p&gt;
+
+&lt;p&gt;그러고 나서 content-adjusted feature인 $f^{c}$는 다음과 같이 정의 됩니다.&lt;/p&gt;
+
+&lt;p&gt;[
+f^{c} = f - \mu \lambda_{norm}^{c}.
+]&lt;/p&gt;
+
+&lt;p&gt;식에서 $\lambda^{c}&lt;em&gt;{norm}$ 가 $0$이라면 $f^{c}$의 위상인 $\rho^{c}$가 $rho$ 와 같아집니다. 
+만약 $\lambda^{c}&lt;/em&gt;{norm}$ 가 $1$이라면 $f^{c}$의 위상인 $\rho^{c}$가 $\rho^{norm}$ 와 같아집니다.&lt;/p&gt;
+
+&lt;p&gt;[
+CCNorm(f) = IFT(compose(\alpha^{\text{norm }}, \rho^{c}))
+]&lt;/p&gt;
+
+&lt;p&gt;정리하자면 CCNorm은 Content Control의 의도로 만들어 졌으며 Learnable parameter에 영향을 받아 feature의 mean shift를 조절하며 mean shift된 feature의 phase인 $\rho^{c}$를 IFT 이전에 Compose하는 원소로 삼아서 계산하게 됩니다.&lt;/p&gt;
+
+&lt;p&gt;지금은 normalized content에 대해서만 살펴보고 있으므로 \lambda^{c}_{org}는 더미 변수로 취급하여 식에 포함시키지 않습니다.&lt;/p&gt;
+
+&lt;h3 id=&quot;3-style-controlling-normalization-scnorm&quot;&gt;3. Style Controlling Normalization (SCNorm)&lt;/h3&gt;
+
+&lt;p&gt;마찬가지로 Instance Normalization을 통해 스타일을 제거하는 측면에서도 똑같은 의문이 제기 됩니다. 
+다음과 같은 근본적인 질문으로 SCNorm은 출발합니다.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;DG에서 Style을 완벽히 제거하는 것이 과연 완전히 긍정적이라고만 볼 수 있을까 ?&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;따라서 저자들은 모델이 CCNorm과 동일하게 Style의 Elimination을 Control할 수 있게 학습하도록 SCNorm 기법을 제안합니다.&lt;/p&gt;
+
+&lt;p&gt;style adjusting terms을 $(\lambda^{s}_{norm}, \lambda^{s}_{org}) = softmax(\lambda^{s}/T_{s})$ 로 표현할 수 있습니다.
+이를 통해 SCNorm에 대한 정의를 다음의 수식으로 내릴 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;[
+SCNorm(f) = IFT(compose(\lambda^{s}_{norm} \alpha^{\text{norm }} + \lambda^{s}_{org} \alpha, \rho))
+]&lt;/p&gt;
+
+&lt;p&gt;두 변수 $\lambda^{s}_{norm}$과 $\lambda^{s}_{org}$는 모델이 독립적으로 pre-normalized의 스타일(진폭)과 post-normalized 스타일(진폭)의 ratio를 결정하도록 합니다.&lt;/p&gt;
+
+&lt;p&gt;$\lambda^{s}_{norm} = 1$ 이면 original style의 전부 제거되었다고 할 수 있고 반대로 $0$이면 original style이 전부 살아있다라고 말할 수 있습니다.&lt;/p&gt;
+&lt;h3 id=&quot;4-dac-p-and-dac-sc&quot;&gt;4. DAC-P and DAC-SC&lt;/h3&gt;
+
+&lt;p&gt;논문에서는 앞서 설명한 CCNorm과 SCNorm을 이용한 ResNet의 Variant models(변형모델)를 소개합니다. 
+&lt;strong&gt;DAC-P&lt;/strong&gt;는 &lt;u&gt;PCNorm&lt;/u&gt;이 적용된 연구 초기에 개발된 모델이고 &lt;strong&gt;DAC-SC&lt;/strong&gt;는 &lt;u&gt;CCNorm과 SCNorm&lt;/u&gt;이 적용된 주요 모델입니다.&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/pcnorm7.png&quot; width=&quot;1000&quot; /&gt;
+&lt;em&gt;논문의 Primary 모델인 DAC-SC 모델의 아키텍쳐 Overview, (b),(c),(d),(e)는 각 Block을 설명하고 있다. 저자들의 Normalization Module은 Resnet의 각 Stage의 BN을 대체하여 일정하게 배치된다.&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;p&gt;기존 ResNet에는 Downsample layer가 존재합니다. 이는 Residual Block에 포함되어있으며 
+DAC-SC는 ResNet 모델의 BN 부분을 PCNorm으로 대체했습니다. 
+기존 Resnet의 Downsample은 다음 수식과 같습니다.&lt;/p&gt;
+
+&lt;p&gt;[
+downsample(x) = BatchNorm(Conv(x))
+]&lt;/p&gt;
+
+&lt;p&gt;PCNorm으로 바뀐 수식은 다음과 같습니다.&lt;/p&gt;
+
+&lt;p&gt;[
+downsample(x) = PCNorm(Conv(x))
+]&lt;/p&gt;
+
+&lt;p&gt;Residual Block은 $\mathcal{H}(x) + x$로 표시됩니다. 여기서 $x$는 Input feature이고, $\mathcal{H}(\cdot)$은 Residual 함수입니다. 다른 레이어와 달리 Downsample 레이어에서 $x$의 형태는 $\mathcal{H}(x)$와 일치하도록 변경됩니다. 즉, 동일성 매핑을 위해서는 $x$의 위상이 불가피하게 변경됩니다. 따라서 Residual $\mathcal{H}(x)$는 콘텐츠 정보가 변경된 Biased input의 근사치로 표현됩니다. 이 층에는 콘텐츠 변동 문제를 가진 BN이 포함되어 있으므로, 이 층에서의 콘텐츠 변화는 더 크게 나타납니다. 결과적으로, $\mathcal{H}(x)$의 편향된 근사치는 DG 성능을 저하시킵니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;experiments&quot;&gt;Experiments&lt;/h2&gt;
+
+&lt;h3 id=&quot;1-dataset&quot;&gt;1. Dataset&lt;/h3&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/pcnorm9.png&quot; width=&quot;600&quot; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;사용한 데이터셋은 일반적인 DG 실험에 사용하는 Dataset을 사용했습니다.&lt;/p&gt;
+
+&lt;h3 id=&quot;2-experimental-details&quot;&gt;2. Experimental Details&lt;/h3&gt;
+
+&lt;p&gt;Reproducing에 참고만 하면 되는 부분이므로 논문 내용을 복붙하였습니다.&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;We chose ResNet50 as a backbone network, the same as the baseline model (ERM). In DAC-P, the BN in all four downsample layers was replaced with PCNorm layers. For DAC-SC, four CCNorm were inserted at the same locations as PCNorm in DAC-P, and three SCNorm were added at the ends of the ﬁrst to third stages, respectively. The afﬁne transform layer of base normalization is transferred to the end of the proposed normalization layer. The model was initialized with ImageNetpre-trained weight. The elements of λ s and λ c were initialized with 0, and the temperatures T s and T c were set to 1e-1 and 1e-6, respectively. For data augmentation, we randomly cropped images on a scale from 0.7 to 1.0 and resized them to 224×224 pixels. Then, we applied random horizontal ﬂip, color jittering, and gray scaling. In training, we used a mini-batch size of 32, and the Nesterov SGD optimizer with a weight decay of 5e-4, a learning rate of 1e-4, and momentum of 0.9. For DomainNet dataset only, the learning rate of 1e-2 was applied. We trained the proposed model for 20 epochs with 500 iterations each, except for DomainNet, which we trained with 7500 iterations and adopted a cosine annealing scheduler with early stopping (tolerance of 4). All experiments were conducted four times and each performance was evaluated on the training-domain validation set, which reserved 20% of source domain data. The performance values were reported using the average performance for the entire domains, which was evaluated using a single out-of-training domain. We conducted an exhaustive hyperparameter search for model selection and evaluated the models based on accuracy. The hardware and software environments were Ubuntu 18.04, Python 3.8.13, PyTorch 1.12.1+cu113, CUDA 11.3, and a single NVIDIA A100 GPU.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&quot;3-comparison-with-sota-methods&quot;&gt;3. Comparison with SOTA Methods&lt;/h3&gt;
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/pcnorm8.png&quot; width=&quot;700&quot; /&gt;
+&lt;/p&gt;
+
+&lt;h3 id=&quot;4-ablation-study&quot;&gt;4. Ablation Study&lt;/h3&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/pcnorm10.png&quot; width=&quot;700&quot; /&gt;
+&lt;em&gt;각종 데이터셋에서 PCNorm, SCNorm, CCNorm을 ResNet의 스테이지별, 스테이지의 Module Position별로 적용했을때 결과, P컬럼의 D,E는 각각 Downsample layer와 End of the stage를 의미한다.&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Ablation Study의 결과를 봤을때 스테이지 초반에 Norm 기법을 적용하는것이 가장 좋았고 CCNorm과 SCNorm을 콤비로 사용했을때의 결과가 가장 좋다는 것을 나타냅니다.&lt;/p&gt;
+
+&lt;p&gt;이러한 Ablation 결과는 content와 style을 normalization 단계에서 모델이 적절히 adjust 하는 것이 좋은 영향을 미친다는 것을 실험적으로 증명합니다.&lt;/p&gt;
+</description>
+        <pubDate>Tue, 16 May 2023 00:00:00 +0900</pubDate>
+        <link>http://localhost:4000/blog/PCNorm</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/PCNorm</guid>
+        
+        <category>moderncv</category>
+        
+        <category>논문리뷰</category>
+        
+        <category>DG</category>
+        
+        <category>Deep learning</category>
+        
+        
+        <category>paper review</category>
+        
+      </item>
+    
+      <item>
+        <title>DINOv2 - Learning Robust Visual Features without Supervision</title>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;FAIR(Facebook AI Research)&lt;/code&gt;에서 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;arXiv&lt;/code&gt;에 게재한 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;DINOv2: Learning Robust Visual Features without Supervision&lt;/code&gt; 를 읽고 작성한 논문 리뷰입니다.
+&lt;br /&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h1 id=&quot;dinov2-learning-robust-visual-features-without-supervision&quot;&gt;DINOv2: Learning Robust Visual Features without Supervision&lt;/h1&gt;
+
+&lt;hr /&gt;
+
+&lt;!-- &lt;iframe width=&quot;674&quot; height=&quot;366&quot; src=&quot;https://www.youtube.com/embed/_T2iOTPzy6c&quot; title=&quot;&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share&quot; allowfullscreen&gt;&lt;/iframe&gt;
+&lt;center&gt;
+    &lt;em&gt;DINOv2 Video Attention Map : FAIR blog&lt;/em&gt;
+&lt;/center&gt;
+
+&lt;br&gt; --&gt;
+&lt;p align=&quot;center&quot;&gt;
+    &lt;video width=&quot;700&quot; controls=&quot;controls&quot;&gt;
+    &lt;source src=&quot;https://seilk.github.io/assets/img/paperreview/dino2.mov&quot; /&gt;
+    &lt;/video&gt;
+    &lt;em&gt;DINOv2 Video Attention Map : FAIR blog&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://user-images.githubusercontent.com/88271769/236690651-6bbea1e1-6731-45ea-874f-abe08ce8b591.png&quot; width=&quot;800&quot; /&gt; 
+&lt;em&gt;DINOv2 Figure1, DINOv2는 이미지 안에서 Object의 의미론적인 Partition을 구분할 수 있다.&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;h2 id=&quot;review-시작&quot;&gt;Review 시작&lt;/h2&gt;
+
+&lt;p&gt;2023년 4월 17일 DINOv2가 공개 되었다.
+&lt;span class=&quot;fs-3&quot;&gt;
+&lt;a href=&quot;https://arxiv.org/abs/2304.07193&quot; class=&quot;btn btn-purple&quot;&gt;Paper&lt;/a&gt;
+&lt;a href=&quot;https://github.com/facebookresearch/dinov2&quot; class=&quot;btn btn-blue&quot;&gt;Code&lt;/a&gt;
+&lt;a href=&quot;https://ai.facebook.com/blog/dino-v2-computer-vision-self-supervised-learning/&quot; class=&quot;btn btn-green&quot;&gt;Official Blog&lt;/a&gt;
+&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;DINOv2의 Motivation은 Computer Vision 분야에서 FineTuning이 필요하지 않은 High Performance를 발현하는 안정적인 Backbone을 만들자! 이다.&lt;/p&gt;
+
+&lt;p&gt;또한 이전에 제시된 우수한 Work들은(&lt;a href=&quot;https://github.com/facebookresearch/mae&quot;&gt;MaskedAE&lt;/a&gt;, &lt;a href=&quot;https://github.com/facebookresearch/dino&quot;&gt;DINO&lt;/a&gt;, &lt;a href=&quot;https://github.com/facebookresearch/swav&quot;&gt;SwAV&lt;/a&gt;…) 정돈되지 않은(Uncurated) 데이터를 베이스로 학습되었기 때문에 잠재력 만큼의 성능이 발현되지 않는다고 설명한다.&lt;/p&gt;
+
+&lt;p&gt;그렇기 때문에 정돈된(Curated) 데이터셋을 활용해서 학습했을때의 드러나지 않았던 잠재력이 나타난다고 한다.&lt;/p&gt;
+
+&lt;p class=&quot;highlight&quot;&gt;한마디로 DINOv2는 대량의 수준높은 정돈된 데이터셋을 사용하여 훈련하고 이를 통해 완벽에 가까운(거의 모든 Down-stream task를 수행할 수 있는) Self-supervised Foundataion Model을 제시하고자 연구되었다.&lt;/p&gt;
+
+&lt;p&gt;오픈-소싱(Open Sourcing)으로 발표되었고 대기업 논문답게 코드 관리가 잘 되어있다.&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;dinov2의-가치novelty&quot;&gt;DINOv2의 가치(Novelty)&lt;/h2&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://user-images.githubusercontent.com/88271769/236818181-59b2c713-232b-4433-b50e-ba520ccedab1.png&quot; width=&quot;800&quot; /&gt;
+&lt;em&gt;Figure 2 : DINOv2는 8가지 이미지 관련 Task에서 Weakly supervised learning의 성능을 뛰어 넘었다.&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;p&gt;DINOv2는 &lt;a href=&quot;https://github.com/bytedance/ibot&quot;&gt;iBOT&lt;/a&gt;과 같은 이미 존재하는 SSL approach &amp;amp; design을 잘 다듬어서 안정화 및 가속화에 기여했다는 것이 Technical contributions이다.&lt;/p&gt;
+
+&lt;p&gt;모델과 데이터 크기의 Scaling이 일어날 때 SSL에 맞는 최적화 디자인을 제시했다.&lt;/p&gt;
+
+&lt;p&gt;말이 그럴싸하지 기존 &lt;a href=&quot;https://github.com/facebookresearch/dino&quot;&gt;DINO&lt;/a&gt;에 비해 사실 매력적이고 참신한 Methodology나 Approach는 없다.&lt;/p&gt;
+
+&lt;p&gt;그러나 논문을 보면 정말 빈틈없이 연구했다는 느낌을 받을 수 있다.&lt;/p&gt;
+
+&lt;p&gt;DINO의 가치는 방법론이 아닌 체계적인 연구, 기존 Work들과의 융합, 그리고 높은 성능을 달성하기 위한 데이터 큐레이팅 능력에 가치가 있다고 생각한다.&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;1-이미지-텍스트-사전-훈련-모델의-한계점-극복&quot;&gt;1. 이미지-텍스트 사전 훈련 모델의 한계점 극복&lt;/h3&gt;
+
+&lt;p&gt;대표적인 이미지-텍스트 Pretrained Model은 &lt;a href=&quot;https://github.com/openai/CLIP&quot;&gt;CLIP(openai)&lt;/a&gt;이 있다. 
+무려 400M(4억개)의 데이터 개수를 바탕으로 멀티모달+컴퓨터비젼 Scene에서 큰 파장을 일으킨 모델이다.&lt;/p&gt;
+
+&lt;p&gt;그러나 이렇게 text-guided로 사전훈련된 모델은 Image feature가 Text(Image caption)에 많이 담겨있다면 Text에 의존해서 Image에 담긴 풍부한 정보들을 추정할 수 있다는 한계가 있다.&lt;/p&gt;
+
+&lt;p&gt;DINOv2는 오로지 이미지만을 사용했기 때문에 CLIP의 Text Input 의존성을 극복하고, Text-guided, Supervised 사전 학습법으로는 배우지 못하는 Image feature에 대해서 모델이 학습할 수 있다.&lt;/p&gt;
+
+&lt;p&gt;그리고 오로지 이미지로만 Self-supervised learning 기법을 통해 CLIP의 성능을 뛰어넘었다.&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;2-data-processing&quot;&gt;2. Data Processing&lt;/h3&gt;
+
+&lt;p&gt;DINOv2와 같은 Foundation Model들은 수준 높은 데이터셋을 요구하는데 DINO v2 에서는 &lt;strong&gt;LVD-142M&lt;/strong&gt; 이라는 데이터셋을 활용한다.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt; 12억개(1.2B)의 이미지 데이터를 웹크롤링을 통해 수집 이렇게 모인 데이터는 Uncurated Data라고 함.&lt;/li&gt;
+&lt;li&gt; ImageNet-22k, ImageNet-1k의 train split, Google Landmarks를 포함한 여러 세분화 된 데이터셋은 Curated Dataset이라고 한다. (수집과정에서 불건전한 Contents는 제외) &lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;LVD-142M를 구축하기 전에 이렇게 Uncurated Data와 Curated Data가 구분된다.
+그리고 이것들을 활용해서 Data Processing을 수행한다.&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://user-images.githubusercontent.com/88271769/236693068-a9d32a6e-cb1e-471d-aedc-2d338e5d0880.png&quot; width=&quot;1000&quot; /&gt;
+&lt;em&gt;DINOv2 Figure3, Data Processing 파이프라인&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;li&gt; &lt;b&gt;Embedding&lt;/b&gt; : ViT-H/16 모델을 사용해서 이미지를 Feature Embedding &lt;/li&gt;
+&lt;li&gt; &lt;b&gt;Deduplication&lt;/b&gt; : 중복 이미지 or 중복에 가까운 이미지 임베딩 제거 (이미 존재하는 알고리즘 사용) &lt;/li&gt;
+&lt;li&gt; &lt;b&gt;Retrieval&lt;/b&gt; : &lt;/li&gt;
+&lt;ol&gt;
+    &lt;li&gt;ImageNet-22k로 SSL Pretrained ViT-H/16 네트워크를 사용하여 이미지 임베딩을 계산 &lt;/li&gt;
+    &lt;li&gt;Cosine Similality를 거리 측정 방법으로 사용하여 Curated 이미지와 가까운 이미지를 포함하는 Uncurated 데이터 소스에서 이미지를 검색. &lt;/li&gt;
+    &lt;li&gt;그런 다음, Uncurated 데이터를 대상으로 &lt;code&gt;k-means&lt;/code&gt; 클러스터링을 수행. &lt;/li&gt;
+    &lt;li&gt;각 Curated 이미지에 대해 최근접 이웃 N(default==4)개를 걺. &lt;/li&gt;
+    &lt;li&gt;검색을 위한 Curated 데이터셋이 충분히 큰 경우, 각 Curated 이미지에 대해 일반적으로 4개의 최근접 이웃 $N$ 을 검색. 만약 Curated 데이터셋의 규모가 작은 경우, 각 Curated 이미지에 해당하는 $M$개 클러스터를 샘플링. &lt;/li&gt;
+    &lt;li&gt; $N$, $M$의 결과를 시각적으로 검토하여 조정. &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;DINOv2 공식 깃헙 &lt;a href=&quot;https://github.com/facebookresearch/dinov2/issues/24&quot;&gt;Issue&lt;/a&gt;에 의하면 이 데이터셋을 공개할 의향은 없지만 Data curating과 관련된 Algorithms은 오픈 소싱 할 의향이 있는것 같다.&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;성능을-올린-방법---detail&quot;&gt;성능을 올린 방법 - Detail&lt;/h2&gt;
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://user-images.githubusercontent.com/88271769/236819439-a5978244-a38a-4fea-9ca5-aa73807456f1.png&quot; width=&quot;1000&quot; /&gt;
+&lt;em&gt;iBOT + 기타 고성능을 위한 이전의 SSL 방법론 &amp;amp; Parameter들 $=$ DINOv2&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;p&gt;DINOv2는 다양한 이전 Work에 발표된 방법들을 도입해서 성능을 높이는 노력을 했다.&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;정성스러운-실험&quot;&gt;정성스러운 실험&lt;/h2&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://user-images.githubusercontent.com/88271769/236694276-e73ef348-df79-42aa-adf5-28c10bd094e9.png&quot; width=&quot;1000&quot; /&gt;
+&lt;em&gt;&lt;b&gt;Carbon Footprint(탄소발자국) 실험결과&lt;/b&gt; : DINOv2는 지구에도 좋다&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://user-images.githubusercontent.com/88271769/236827347-3f23baa1-c2d0-473e-9f42-75a8b7f6775f.png&quot; width=&quot;1000&quot; /&gt;
+&lt;em&gt;&lt;b&gt;인간의 피부색, 성별, 연령 분류에 관한 실험&lt;/b&gt; : AI 모델의 윤리에 대한 이슈가 많아지는 추세를 따라 실험을 한 것으로 보인다.&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://user-images.githubusercontent.com/88271769/236822551-02a504e5-dbeb-4142-828b-a7540b01baa3.png&quot; width=&quot;1000&quot; /&gt;
+&lt;em&gt;&lt;b&gt;LVD-142M Dataset 위력 평가&lt;/b&gt; : iBOT을 대상으로 Pretrain에 사용한 데이터를 바꿔가며 비교 실험 했더니 Curated Dataset(LVD-142M)으로 사전 훈련된 모델이 가장 높은 성능을 보였다.&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://user-images.githubusercontent.com/88271769/236823833-c4356055-a1c5-4816-8099-8a0166931e22.png&quot; width=&quot;1000&quot; /&gt;
+&lt;em&gt;&lt;b&gt; Knowledge Distillation vs Scratch 성능 비교&lt;/b&gt; : Teacher:ViT-g / Student:ViT-L* KD전략은 훨씬 작은 파라미터개수로 높은 퍼포먼스를 낼 수 있게 도움을 준다.&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;results&quot;&gt;Results&lt;/h2&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://user-images.githubusercontent.com/88271769/236693337-f3a7f338-e979-4ac9-b32f-1806cbba761e.png&quot; width=&quot;1000&quot; /&gt;
+&lt;em&gt;&lt;b&gt; ImageNet-1k Classification 성능&lt;/b&gt; : Only Image Data으로 내로라하는 모델들과 견줄 수 있다.&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://user-images.githubusercontent.com/88271769/236693359-384358d9-445a-42a6-ae11-83bf7d4decec.png&quot; width=&quot;1000&quot; /&gt;
+&lt;em&gt;&lt;b&gt; Supervised Fine-tune vs. DINOv2&lt;/b&gt; : 무려 Supvervised Learning보다 2p% 격차로 성능이 더 높다.&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://user-images.githubusercontent.com/88271769/236824780-a4a57a34-d498-43c0-ab38-053099e9cbb2.png&quot; width=&quot;1000&quot; /&gt;
+&lt;em&gt;&lt;b&gt;Domain Generalization 성능 결과&lt;/b&gt; : 도메인간에 분포차이(Domain Shift)에 상관없이 좋은 퍼포먼스를 낸다.&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;u&gt;DG 실험에 대한 개인적인 의견&lt;/u&gt;
+&lt;br /&gt;
+저는 &lt;b&gt;Table 6.&lt;/b&gt;에 대한 결과는 Dataset 체급에 대한 영향이 크다고 생각합니다. &lt;b&gt;LVD-142M&lt;/b&gt;은 수준높게 선별된 데이터일뿐만 아니라 깡 데이터 개수도 많기 때문에 그 안에 어떤 차별점을 갖는 이미지들이 포함되어있는지 알 수 없습니다. 
+DG, UDG 분야는 데이터의 수준이 일관하고 그 안에서 이미지 분포를 Align 시키기 위해 수학적으로 맞추는 방법론을 사용할 수 있고 모델의 특성과 고차원의 Latent Space를 도입하는 방법등을 통해 연구 진행방향이 설정되어야 한다고 생각합니다. 
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://user-images.githubusercontent.com/88271769/236693622-08d35a6d-b0dd-4c40-87d3-986ff4ab529d.png&quot; width=&quot;1000&quot; /&gt;
+&lt;em&gt;&lt;b&gt;DINOv2 최종 Output에 PCA를 거친 결과물&lt;/b&gt; : Top3 Component를 각각 RGB채널로 여긴다음에 각 패치마다의 ColorMap을 Visualization 한 결과이다. DINOv2는 이미지 내 Object의 Component를 Semantic하게 분류 할 수 있는 능력이 있다. (오른쪽 위 말 사진의 엉덩이, 허리, 머리, 다리가 Map에서 구분된다.)&lt;/em&gt;
+&lt;/p&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;future-work&quot;&gt;Future Work&lt;/h2&gt;
+&lt;p&gt;이번 논문은 Self-supervised Learning 상황에서 대규모로 선별된(Curated) 데이터에 대해 사전 훈련된 새로운 이미지 인코더 시리즈인 DINOv2를 소개했다.&lt;/p&gt;
+
+&lt;p&gt;DINOv2는 Finetuning 없이 다양한 벤치마크에서 Weakly-supervised learning에 필적하는 성능으로 우수한 Visual Feature를 달성하는 이미지 데이터에 대한 최초의 SSL(Self-supervised Learning) 접근 방식이다.&lt;/p&gt;
+
+&lt;p&gt;DINOv2는 특정 이미지 도메인에 제한되지 않는 Object part 및 Scene geometry에 대한 이해와 같은 Properties를 나타낸다.&lt;/p&gt;
+
+&lt;p&gt;모델과 데이터가 확장됨에 따라 Large Scale NLP 모델에서 새로운 언어 지침이 등장하는 것과 유사하게 이러한 속성이 더 많이 나타날 것으로 예상된다.&lt;/p&gt;
+
+&lt;p&gt;또한 이 논문에서는 이러한 시각적 기능을 선형 레이어와 같은 간단한 분류기와 함께 사용할 수 있음을 보여주어 기본 정보를 쉽게 사용할 수 있음을 강조한다.&lt;/p&gt;
+
+&lt;p&gt;미래에는 이 Foundation 모델들이 더 많아질 것이고 Foundation 모델을 활용하여 Visual Feature를 마치 &lt;strong&gt;단어 토큰&lt;/strong&gt;인 것처럼 처리하고 필요한 정보를 추출하여 시스템을 접지할 수 있는 AI 시스템을 훈련시킬 수 있을 것이다.&lt;/p&gt;
+
+&lt;p&gt;Meta에서는 이러한 연구방향성을 가지고 계속해서 확장할 계획이라고 한다.&lt;/p&gt;
+</description>
+        <pubDate>Mon, 08 May 2023 00:00:00 +0900</pubDate>
+        <link>http://localhost:4000/blog/DINOv2</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/DINOv2</guid>
+        
+        <category>moderncv</category>
+        
+        <category>논문리뷰</category>
+        
+        <category>SSL</category>
+        
+        <category>Deep learning</category>
+        
+        
+        <category>paper review</category>
+        
+      </item>
+    
+      <item>
+        <title>DINO - Emerging Properties in Self-Supervised Vision Transformers</title>
+        <description>&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://velog.velcdn.com/images/seilk/post/02abc711-9c6e-47d2-b2d3-4cd4268c5bc1/image.png&quot; width=&quot;800&quot; /&gt;
+&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;FAIR(Facebook AI Research)&lt;/code&gt;에서 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ICLR&lt;/code&gt;에 게재한 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;DINO - Emerging Properties in Self-Supervised Vision Transformers&lt;/code&gt; 를 읽고 작성한 논문 리뷰입니다.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;beginning-review&quot;&gt;Beginning Review&lt;/h1&gt;
+&lt;p&gt;Facebook(현 Meta)에서 발표한 Transformer 기반 Self-supervised learning 논문입니다.&lt;/p&gt;
+
+&lt;p&gt;2019년(CVPR`20) &lt;a href=&quot;https://ieeexplore.ieee.org/document/9157636&quot;&gt;MoCo&lt;/a&gt;와 2020년(ICLR`20) &lt;a href=&quot;https://arxiv.org/abs/2002.05709&quot;&gt;SimCLR&lt;/a&gt;가 Self-supervised learning 분야에 굵직한 임팩트를 주고 나서, 2021년에 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;트랜스포머&lt;/code&gt; 기반의 새로운 Self-supervised learning method가 이 논문을 통해 공개되었습니다.&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;저자들은 CNN의 Self-supervised learning과 비교해서 Transformer의 Self-supervised learning이 어떤 새로운 특성을 발견해내고 어떤 성능을 보여줄지 궁금해했다.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;figure1--attention-map-of-transformer-via-dino&quot;&gt;Figure.1 : Attention Map of Transformer via DINO&lt;/h1&gt;
+&lt;p&gt;논문을 열어보면 Abstract를 들어가기도 전에 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;figure.1&lt;/code&gt;에 Self-attention map이 등장합니다.
+저자들은 지도 없이(no-supervision) DINO를 훈련시켰을 때 Vision Transformer(ViT)에서 추출할 수 있는 Self-attention map이라고 이 figure를 소개합니다.&lt;/p&gt;
+
+&lt;p&gt;마치 열화상 카메라로 물체를 촬영한 듯이 정말 디테일한 부분까지 모델이 Attention map에 잘 표현했다고 할 수 있다. Computer Vision의 분야 중 Weakly Supervised Sementic Segmentation(WSSS)라는 분야에서 다루는 Class Activation Map(CAM)과 비슷한 ‘시각화 맵(Visualization Map)’이라고 할 수 있는데, 정성적인 결과가 매우 뛰어나다고 할 수 있습니다.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;참고 : Figure 1은 ViT의 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;[CLS]&lt;/code&gt; 토큰의 벡터를 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;[batch, embed_dim]&lt;/code&gt; 마지막 Layer의 모든 Head에서의 Attention weight를 시각화 한 것입니다. (CLS 토큰이 Query이고 패치 토큰이 Key)*&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+ &lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/dino1_1.png&quot; width=&quot;1000&quot; /&gt;
+&lt;em&gt;DINO의 정성적인(Qualitative) 결과(Figure 1)는 매우 뛰어나다. 객체의 디테일한 부분을 놓치지 않고 잡아내며 Computer Vision 분야에서의 Transformer의 위용을 다시 한번 보여줬다. 심지어 모델은 정답을 배우지 않은 no-supervision 훈련의 결과물이다.&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;그래서-정확히-얼마나-뛰어난데&quot;&gt;그래서 정확히 얼마나 뛰어난데?&lt;/h1&gt;
+
+&lt;p&gt;논문의 Approach및 Analysis에 앞서 DINO가 정성적인 결과 말고도 정량적인 측면에서 얼마나 뛰어난지에 대해 미리 살펴보고 리뷰를 이어 나가겠습니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;1-main-results-imagenet-classification&quot;&gt;1. Main Results (ImageNet Classification)&lt;/h2&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/dino1_2.png&quot; width=&quot;500&quot; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;이 Table은 DINO 논문의 가장 핵심적인 성능 평가 Table입니다. Self-Supervised Learning에서는 보통 Foundation Model(Down-stream task를 수행하는 사전훈련된 모델)을 만드는것에 주안점을 둡니다.&lt;/p&gt;
+
+&lt;p&gt;그리고 SSL로 학습시킨 모델의 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Pretrained weight&lt;/code&gt;를 사용해서 MLP로 구성된 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Linear Classifier&lt;/code&gt; 또는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kNN&lt;/code&gt; 또는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Logistic Regression&lt;/code&gt;을 분류목적으로 모델 마지막 단에 달아주고 Downstream Task를 및 훈련-평가하는 과정을 거칩니다.&lt;/p&gt;
+
+&lt;p&gt;그래서 SSL 연구가 모델의 지능으로 Input data를 &lt;strong&gt;‘알아서(self)’ 어디까지 해석 할 수 있는지&lt;/strong&gt; 그 끝을 보기 위한 연구로 해석됩니다.&lt;/p&gt;
+
+&lt;p&gt;DINO는 이전에 발표된 Work들과 비교해서 상대적으로 더 뛰어난 성능을 보입니다.&lt;/p&gt;
+
+&lt;p&gt;Table에서 재밌는 점은 DINO의 Main inspiration은 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Do Transformer SSL well?&lt;/code&gt;인데 &lt;strong&gt;성능 평가에서는 RN50(ResNet50)을 Backbone으로 사용했을때도 다른 이전 Work들 보다 뛰어난 성능을 보였다는 것입니다.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;그 말은 단순히 Transformer를 SSL에 적용시켜 보았다는 Contribution뿐만 아니라 그 외의 SSL에 관한 Contribution이 존재한다는 말이겠죠?&lt;/p&gt;
+
+&lt;p&gt;성능으로 봤을때 또 한가지 DINO의 눈에 띄는 장점으로는 학습이 필요없이 알고리즘으로 Clustering만 필요로 하는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kNN&lt;/code&gt; 방식의 Classifier만으로도 이전 Work에 비해 훌륭한 성능을 냈다는 점인데요.&lt;/p&gt;
+
+&lt;p&gt;논문의 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Appendix. A.&lt;/code&gt;에서도 DINO는 시간과 자원이 상대적으로 더 필요한 Linear Classifier보다 가볍고 빠른 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kNN&lt;/code&gt; 알고리즘에 유연성(flexibility)을 가진다고 설명합니다.&lt;/p&gt;
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/dino1_3.png&quot; width=&quot;700&quot; /&gt;
+&lt;em&gt;본문 : &quot;DINO might offer more model ﬂexibility that beneﬁts the k-NN evaluation. K-NN classiﬁers have the great advantage of being fast and light to deploy, &lt;u&gt;without requiring any domain adaptation.&lt;/u&gt; Overall, ViT trained with DINO provides features that combine particularly well with k-NN classiﬁers.&lt;/em&gt;
+&lt;/p&gt;
+&lt;p&gt;&lt;br /&gt;
+추가로 Table에는 훈련속도와 관련된 지표(&lt;strong&gt;im/s&lt;/strong&gt; : 초당 처리하는 단일 이미지의 장수)도 주어지고 전체 Parameter 개수(Million 단위)도 주어져 있기 때문에 DINO의 성과를 여러 방향으로 평가할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;성능 Table을 보고 설명할 수 있는 Dino의 특징을 정리하자면 다음과 같습니다.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;ol&gt;
+    &lt;li&gt;SSL 해보니까 Backbone 쓸 때 ResNet 쓰는거보다 ViT의 성능이 뛰어나더라.&lt;/li&gt;
+    &lt;li&gt;Dino 방식으로 SSL을 하면 ResNet도 성능이 좋아지더라.&lt;/li&gt;
+    &lt;li&gt;ViT의 Parameter중에서 Patch size가 작을 수록 성능이 좋다.&lt;/li&gt;
+    &lt;li&gt;당연한 얘기지만 ViT의 전체적인 모델 규모가 크면 클수록 성능이 좋다.(B&amp;gt;S&amp;gt;T)&lt;/li&gt;
+    &lt;li&gt;성능이 좋을수록 im/s는 예외없이 구려진다. (DINO 자체는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;V100*8개*2개서버&lt;/code&gt;의 자원을 활용해 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;3days&lt;/code&gt;간 Training. ImageNet1k)&lt;/li&gt;
+  &lt;/ol&gt;
+&lt;/blockquote&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/dino1_5.png&quot; width=&quot;700&quot; /&gt;
+&lt;em&gt;SSL에서도 VisionTransformer는 역시 PatchSize Parameter가 중요하다.&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/dino1_6.png&quot; width=&quot;700&quot; /&gt;
+&lt;em&gt;DINO의 방식대로 SSL을 한다면 CNN based또한 이전 Work들의 성능보다 높다.&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;h2 id=&quot;2-transfer-learning-vs-supervised&quot;&gt;2. Transfer learning (vs. Supervised)&lt;/h2&gt;
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://velog.velcdn.com/images/seilk/post/3f0b9283-d621-443c-bc85-63b560c09316/image.png&quot; width=&quot;700&quot; /&gt;
+&lt;em&gt;지도학습 된 모델과의 전이 학습 성능을 평가한 Table&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;p&gt;DINO는 Unsupervised Training으로 Supervised Training을 앞지릅니다. 
+그만큼 모델이 개별 이미지의 특징이 되는 부분을 잘 이해하고 있다는 뜻입니다. (e.g. Texture, Tactile과 같은 Properties)&lt;/p&gt;
+
+&lt;h2 id=&quot;3-etc&quot;&gt;3. etc&lt;/h2&gt;
+&lt;p&gt;Copy detection, Image Retrieval, Video object segmentation에 관한 성능평가도 존재하지만 이 리뷰에서는 다루지 않습니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;approach&quot;&gt;Approach&lt;/h1&gt;
+&lt;p&gt;DINO의 우수한 성능을 봤으니 논문에 쓰인 내용을 바탕으로 이제 어떤 Flow로 모델이 훈련되는지 알아보겠습니다. 그리고 실제 코드를 뜯어보고 그 안에 숨은 디테일도  분석해 보겠습니다.&lt;/p&gt;
+&lt;h2 id=&quot;1-self-training-and-knowledge-distillation&quot;&gt;1. Self-training and knowledge distillation.&lt;/h2&gt;
+
+&lt;h3 id=&quot;model-flow&quot;&gt;Model Flow&lt;/h3&gt;
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/dino1_4.png&quot; width=&quot;700&quot; /&gt;
+&lt;em&gt;DINO 훈련 진행 흐름&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Teacher와 Student로 구성되어 우수한 Teacher 모델의 지식(Knowledge)을 증류(Distillation)하는 기법인 KD(Knowledge Distillation) 방법에 대해서 알고 있다면 이해가 쉽습니다.&lt;/p&gt;
+
+&lt;p&gt;DINO는 Self-supervised learning에 KD를 적용했다. (이 Self-supervised 훈련 방식은 DINO가 처음 제안한 방식은 아니다.)&lt;/p&gt;
+
+&lt;h3 id=&quot;algorithms&quot;&gt;Algorithms&lt;/h3&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+    &lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/dino_algo.png&quot; width=&quot;600&quot; /&gt;
+    &lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/dino_code1.png&quot; width=&quot;800&quot; /&gt;
+    &lt;em&gt;Algorithm of DINO Multi-Crop Strategy를 사용하지 않았을 때의 수도코드와 실제 코드 비교. (실제 코드는 Multi-Crop Strategy를 사용한 경우.)&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;center&gt;
+
+&lt;/center&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot;&gt;
+    &lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/dino_code2.png&quot; width=&quot;900&quot; /&gt;
+    &lt;em&gt;실제코드에서의 &lt;code&gt;DINOLoss&lt;/code&gt; 클래스&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;2-image-transformation-and-multi-crop-strategy&quot;&gt;2. Image Transformation and Multi-Crop Strategy.&lt;/h2&gt;
+
+&lt;p&gt;Image Transformation은 Multi-Crop Stategy를 사용하는지 안하는지에 따라 달라집니다.&lt;/p&gt;
+
+&lt;p&gt;Model Flow Figure에서는 설명을 위해 Multi-Crop Stategy를 사용하지 않는 Global View만 다뤘습니다.&lt;/p&gt;
+
+&lt;p&gt;Multi-Crop의 종류로는 global view와 local view가 있는데, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;torchvision.transforms.RandomResizedCrop&lt;/code&gt; 모듈을 사용합니다.&lt;/p&gt;
+
+&lt;p&gt;global view와 local view의 차이점은 scale이 global(전역적)인지 local(지역적)인지에 대한 내용입니다.&lt;/p&gt;
+
+&lt;p&gt;global view image는 사진에서 넓은 spatial을 포함하게 되고 \(224^2\) 의 사이즈를 갖습니다.&lt;/p&gt;
+
+&lt;p&gt;global view image는 사진에서 좁은 spatial을 포함하게 되고 \(96^2\) 의 사이즈를 갖습니다.&lt;/p&gt;
+
+&lt;p&gt;결국 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Dataloader&lt;/code&gt;에서 불러올 때 images의 shape은 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;[10,B,3,h,w]&lt;/code&gt; 이며 10가지 view의 이미지 세트가 배치 개수만큼 들어있고 이 중 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;[:2]&lt;/code&gt;에 해당하는 &lt;u&gt;global view는 Teacher Network에만 들어가고 Student는 전부를 입력받습니다.&lt;/u&gt;&lt;/p&gt;
+
+&lt;p&gt;Multi-Crop Stategy가 적용 된 뒤에 모델에 전달되는 코드는 다음과 같습니다.&lt;/p&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cuda&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;amp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;autocast&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fp16_scaler&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;is&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;not&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;teacher_output&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;teacher&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;images&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;# only the 2 global views pass through the teacher
+&lt;/span&gt;            &lt;span class=&quot;n&quot;&gt;student_output&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;student&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;images&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;loss&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dino_loss&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;student_output&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;teacher_output&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;epoch&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p align=&quot;center&quot;&gt;
+ &lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/dino1_7.png&quot; width=&quot;700&quot; /&gt;
+ &lt;em&gt;이해를 돕기 위한 Dataset Input Overview&lt;/em&gt;
+ &lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot;&gt;
+ &lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/dino1_code4.png&quot; width=&quot;700&quot; /&gt;
+  &lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/dino1_code5.png&quot; width=&quot;500&quot; /&gt;
+ &lt;em&gt;augmentation 부분 Class&lt;/em&gt;
+ &lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+    &lt;img alt=&quot;&quot; src=&quot;https://seilk.github.io/assets/img/paperreview/dino1_code6.png&quot; width=&quot;700&quot; /&gt;
+    &lt;img alt=&quot;&quot; src=&quot;https://seilk.github.io/assets/img/paperreview/dino1_code7.png&quot; width=&quot;700&quot; /&gt;
+    &lt;em&gt;Left : MultiCropWrapper Class, Right : student, teacher 선언 하는 부분&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;[
+ \min_{\theta_s}{\sum_{x \in { x^g_1 , x^g_2 }}}{\sum_{x^{\prime} \in V , x^{\prime}\neq x}} H(P_t{(x)}, P_s{(x^\prime)})
+]&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+    $x^g$ : Global view of $x$ (only $2$)
+&lt;br /&gt;
+    $x^{\prime}$ : Local view of $x$ (user setting; default : $8$)
+&lt;br /&gt;
+    $V$ : Local view set of $x$
+&lt;/p&gt;
+
+&lt;p&gt;Teacher network의 Input과 Student network의 Input은 같은 이미지지만 Resolution이 다른 Augmentated Image가 들어갑니다.
+이는 &lt;strong&gt;“local-to-global”&lt;/strong&gt; 개념과 일맥상통하게 합니다.&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;student는 local을 학습하고 가중치를 teacher에게 전달함. student는 global view를 학습하는 teacher와 닮아가게 됨&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;DataAugmentationDINO&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;__init__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;global_crops_scale&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;local_crops_scale&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;local_crops_number&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;flip_and_color_jitter&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;transforms&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Compose&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;transforms&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RandomHorizontalFlip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;transforms&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RandomApply&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+                &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;transforms&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ColorJitter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;brightness&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;contrast&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;saturation&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hue&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)],&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.8&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;transforms&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RandomGrayscale&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;normalize&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;transforms&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Compose&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;transforms&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ToTensor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(),&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;transforms&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Normalize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.485&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.456&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.406&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.229&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.224&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.225&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)),&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+
+        &lt;span class=&quot;c1&quot;&gt;# first global crop
+&lt;/span&gt;        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;global_transfo1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;transforms&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Compose&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;transforms&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RandomResizedCrop&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;224&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;scale&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;global_crops_scale&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;interpolation&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Image&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BICUBIC&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;flip_and_color_jitter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;utils&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GaussianBlur&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;normalize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;# second global crop
+&lt;/span&gt;        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;global_transfo2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;transforms&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Compose&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;transforms&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RandomResizedCrop&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;224&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;scale&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;global_crops_scale&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;interpolation&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Image&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BICUBIC&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;flip_and_color_jitter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;utils&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GaussianBlur&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;utils&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Solarization&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;normalize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;# transformation for the local small crops
+&lt;/span&gt;        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;local_crops_number&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;local_crops_number&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;local_transfo&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;transforms&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Compose&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;transforms&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RandomResizedCrop&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;96&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;scale&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;local_crops_scale&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;interpolation&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Image&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BICUBIC&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;flip_and_color_jitter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;utils&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GaussianBlur&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;normalize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;3-stop-gradient-and-ema-updatestudent-teacher&quot;&gt;3. Stop gradient and EMA update(student-&amp;gt;teacher)&lt;/h2&gt;
+&lt;p&gt;DINO 모델의 특징으로는 Teacher 모델은 직접 Back Propagation을 통해 파라미터들을 업데이트 하지 않고 
+Student Parameter에서 &lt;strong&gt;Exponential Moving Average(EMA : 지수이동평균) 방식을 사용해 Parameter를 업데이트&lt;/strong&gt; 한다는 것입니다. &lt;em&gt;(MoCo에서 Momentum Update를 하는 방식과 동일합니다.)&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;[
+θ_t = λθ_t + (1-λ)θ_s
+]&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/dino1_8.png&quot; width=&quot;800&quot; /&gt;
+&lt;em&gt;best acc에서 Momentum Update 경향성, Cosine Scheduler를 따른다. (copyrights: seilk)&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;p&gt;EMA에 대한 업데이트 규칙은 위의 식과 같으며 \(λ\)는 훈련 중 0.996에서 1까지의 Cosine Scheduler를 따른다.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# EMA update for the teacher
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;no_grad&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# Stop gradient
+&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;momentum_schedule&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;it&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;# momentum parameter
+&lt;/span&gt;    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;param_q&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;param_k&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;zip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;student&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;parameters&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;teacher_without_ddp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;parameters&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()):&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;param_k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mul_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;add_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;param_q&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;detach&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;이렇게 하는 이유는 특별한 인과관계가 있다기 보단 귀납적으로 이 프레임워크에서 이 방법이 특히 잘 작동한다는 것을 발견했기 때문이라고 설명합니다.&lt;/p&gt;
+
+&lt;p&gt;Teacher model이 EMA 방식으로 student의 parameter를 받아오기 때문에 이는 student의 시간의 변화에 따른 checkpoint를 부드럽게 ensemble을 하여 student model의 일반성을 체득할 수 있다고 설명합니다.&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+    &lt;img alt=&quot;&quot; src=&quot;https://seilk.github.io/assets/img/paperreview/dino1_9.png&quot; width=&quot;590&quot; /&gt;
+    &lt;img alt=&quot;&quot; src=&quot;https://seilk.github.io/assets/img/paperreview/dino1_10.png&quot; width=&quot;544&quot; /&gt;
+&lt;/p&gt;
+&lt;center&gt; &lt;em&gt;Left : ViT, Right : ResNet&lt;/em&gt; &lt;/center&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;위의 Figure는 DINO에서 EMA 방식으로 했을 때 Pretrained 되지 않은 Teacher가 Student의 성능보다 우수하므로 의미론적으로도 Teacher network를 Teacher network라고 취급 할 수 있음을 보여줍니다.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;teacher network의 파라미터는 dynamically하게 student의 파라미터의 평균이 되는데 이는 &lt;strong&gt;Polyak-Ruppert averaging&lt;/strong&gt;과 같은 모델 ensemble 효과를 보인다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/dino1_11.png&quot; width=&quot;544&quot; /&gt;
+&lt;em&gt;momentum update를 여러 학습 간격을 두고 ablation 했을때의 Top-1 acc&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;p&gt;위의 Figure에 모델의 Top-1 Accuracy를 측정한 자료가 나와있습니다. 단순 모델 복제(Student Copy), 직전의 이터레이션 모델 복제(Previous iter), 직전의 에폭 모델 복제(Previous epoch), 모멘텀 업데이트(Momentum)의 성능이 비교대상군입니다.&lt;/p&gt;
+
+&lt;p&gt;Self-supervised Learning에서 가장 두려운 상황이 Model Collapse 상황입니다.&lt;/p&gt;
+
+&lt;p&gt;Model Collapse 상황이란 간단히 말하자면 입력값과 상관없이 출력값이 하나의 차원이 dominate 하거나, 모든 차원에 대하여 uniform 한 상황을 말합니다.&lt;/p&gt;
+
+&lt;p&gt;SG(Stop gradient)를 걸어놓고 가중치를 업데이트하는 상황에서 Teacher의 가중치가 &lt;strong&gt;매우 빠르게 업데이트&lt;/strong&gt; 되면 Teacher와 Student의 앙상블 효과를 기대할 수 없게 되고 두 모델의 차이점이 없어지게 되면 자연스레 Model Collapse 문제가 일어나게 됩니다.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;SSL에서의 “collapse” 개념은 학습된 표현이 다양성이나 구별력을 상실하여 유사하거나 구분할 수 없게 되는 현상을 가리킵니다.
+SSL 학습 중에 모델이 collapse되면, 모델이 데이터의 내재된 구조나 변동성을 제대로 포착하지 못하고 입력에 상관없이 유사한 표현을 생성하는 것을 의미합니다. 이러한 collapse는 모델이 사용하는 간단하거나 비효율적인 학습 전략으로 인해 발생할 수 있습니다.
+Collapse는 다양한 형태로 나타날 수 있으며, 예를 들면 다음과 같습니다:&lt;/p&gt;
+  &lt;ol&gt;
+    &lt;li&gt;Mode collapse: 모델이 주어진 데이터의 다양성을 무시하고 몇 가지 우세한 Mode나 Pattern으로 collapse되는 경우입니다. 이로 인해 표현은 입력 분포의 전체 변동 범위를 포착하지 못하게 됩니다.&lt;/li&gt;
+    &lt;li&gt;Semantic collapse: 모델이 서로 다른 입력을 동일하거나 유사한 표현으로 매핑하여 의미적인 차이를 무시하는 경우입니다. 결과적으로 모델은 의미적으로 다른 객체나 개념을 구별할 수 없게 됩니다.&lt;/li&gt;
+    &lt;li&gt;Gradient collapse: 모델의 기울기가 지나치게 작아지거나 사라져서 모델 파라미터에 효과적인 업데이트가 이루어지지 않는 경우에 기울기 collapse가 발생할 수 있습니다. 이는 모델이 나쁜 지역 최적해에 갇히거나 의미 있는 표현을 학습하지 못하게 할 수 있습니다.&lt;/li&gt;
+  &lt;/ol&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;4-centering-sharpening&quot;&gt;4. Centering, Sharpening&lt;/h2&gt;
+
+&lt;p&gt;앞서 말한 Model Collapse를 해결하기 위해서 DINO에서는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Centering&lt;/code&gt;과 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Sharpening&lt;/code&gt; 기법을 사용합니다.&lt;/p&gt;
+
+&lt;p&gt;[
+ g_t(x) ← g_t(x) + c
+]&lt;/p&gt;
+
+&lt;p&gt;이전 Work들의 Avoiding Collapse의 방법으로 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Contrastive loss&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Clustering constraints&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Predictor&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Batch Normalization&lt;/code&gt; 등이 있는데, 
+DINO에서는 Teacher output의 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Centering&lt;/code&gt;과 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Sharpening&lt;/code&gt;을 해주는 것만으로 모델을 안정화(Stablization)할 수 있다고 설명한다.&lt;/p&gt;
+
+&lt;p&gt;Centering은 Output이 한개의 차원에 지배적인(dominated) 상황을 억제하지만 Output이 Uniform distribution이 되도록 하는 특성을 가지고 있고 Sharpening은 그 반대의 특성을 가지고 있다.&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/dino1_12.png&quot; width=&quot;700&quot; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;&lt;strong&gt;Target Entropy&lt;/strong&gt; : Teacher model의 Output의 ‘정보 불안정성(unstable)’을 의미한다. 이 값이 높을 수록 Teacher model이 뱉는 Softlabel이 일관되지 않고 중구난방으로 값이 튄다는 것을 의미한다. &lt;strong&gt;KL divergence&lt;/strong&gt; : Student Model Output과 Teacher Model Output의 분포 차이도를 의미한다. 이 값이 0에 가까울 수록 Student와 Teacher가 같은 feature를 추출한다고 할 수 있고 이렇게 되면 Model은 더 이상 새로운 Feature를 학습 할 수 없고 해당 결과에 Dominate된다고 간주한다.&lt;/em&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;결론은 둘 다 사용해야 Model Collapse를 방지하는것에 효과적이라는 말&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;5-cross-entropy&quot;&gt;5. Cross-Entropy&lt;/h2&gt;
+
+&lt;p&gt;[
+ P_{s}(x)^{(i)} = \frac{\exp{(g_{\theta_s}{x}^{(i)}} / \tau_{s})}{\sum_{k=1}^{K}{\exp(g_{\theta_s}{(x)^{(k)}}}/{\tau_s})}
+]&lt;/p&gt;
+
+&lt;p&gt;[
+ \min_{\theta_s}{H(P_t(x), P_s(x))}
+]&lt;/p&gt;
+
+&lt;p&gt;[
+ H{(a, b)} = −alogb
+]&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+    &lt;em&gt;$P_t$ : Teacher Network Probability&lt;/em&gt;
+    &lt;br /&gt;
+    &lt;em&gt;$P_s$ : Student Network Probability&lt;/em&gt;
+    &lt;br /&gt;
+    &lt;em&gt;$g_{\theta_t}$ : Teacher Network&lt;/em&gt;
+    &lt;br /&gt;
+    &lt;em&gt;$g_{\theta_s}$ : Student Network&lt;/em&gt;
+    &lt;br /&gt;
+    &lt;em&gt;$\tau$ : Temperature&lt;/em&gt;
+    &lt;br /&gt;
+    &lt;em&gt;$K$ : Dimension of output&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;p&gt;DINO는 SSL(self-supervised learning)에 사용되는 샴 네트워크(Siamese-Network)를 지식 증류(Knowledge Distillation)의 한 형태로 구성합니다. 여기에서 Student network는 더 나은 성능의 Teacher network의 출력을 모방하도록 훈련됩니다. 이를 달성하기 위해 DINO는 Teacher network와 Student network의 출력 사이에 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Cross-Entropy&lt;/code&gt;를 사용하여 Student network를 교육하는 동시에 Teacher network에 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Stop gradient&lt;/code&gt;를 적용하여 훈련 중에 업데이트되지 않도록 합니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;마치며&quot;&gt;마치며&lt;/h1&gt;
+&lt;p&gt;대기업 논문이라 그런지 Git 코드 관리도 굉장히 잘 되어 있고 방법론을 여기저기에 쓸 만 할 것으로 생각됩니다.&lt;/p&gt;
+
+&lt;p&gt;이 리뷰에 전부 다 담지 못한(TODO Review) 굉장히 디테일한 Ablation Study가 있는데 그만큼 실험적 증명이 탄탄하고 우연의 일치로 좋은 결과가 나왔다는 반박을 할 수 없도록 하는 논문인 것 같습니다.&lt;/p&gt;
+
+&lt;p&gt;끝으로 시각자료들을 첨부하고 논문리뷰를 마치겠습니다.🔜&lt;/p&gt;
+
+&lt;h2 id=&quot;1-대략적인-전체-학습-과정&quot;&gt;1. 대략적인 전체 학습 과정&lt;/h2&gt;
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://velog.velcdn.com/images/seilk/post/40a4e5b4-68fc-4b67-9cde-ebdd4b6897d1/image.gif&quot; width=&quot;700&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;2-supervised-와의-self-attention-map-결과물-비교&quot;&gt;2. Supervised 와의 Self-attention Map 결과물 비교&lt;/h2&gt;
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://velog.velcdn.com/images/seilk/post/daa44472-8e1f-491b-95c3-d3b8f55b9235/image.png&quot; width=&quot;800&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;43-attention-map-of-video&quot;&gt;4.3 Attention Map of Video&lt;/h2&gt;
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://velog.velcdn.com/images/seilk/post/c6f8553f-8e55-4dd1-8f3c-6804d6564318/image.gif&quot; width=&quot;700&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;ps. 근데 DINOv2도 나옴&lt;/p&gt;
+
+</description>
+        <pubDate>Mon, 01 May 2023 00:00:00 +0900</pubDate>
+        <link>http://localhost:4000/blog/DINO</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/DINO</guid>
+        
+        <category>moderncv</category>
+        
+        <category>논문리뷰</category>
+        
+        <category>SSL</category>
+        
+        <category>Deep learning</category>
+        
+        
+        <category>paper review</category>
+        
+      </item>
+    
+  </channel>
+</rss>

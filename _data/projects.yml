@@ -1,0 +1,20 @@
+- name: Domain Generalization
+  link:
+  image: https://www.researchgate.net/profile/Liang-Xiao-8/publication/334695033/figure/fig1/AS:784753015943168@1564111107129/Sample-images-from-PACS-dataset-Each-row-represents-a-domain-and-each-column-represents.ppm
+  description: Unsupervised, Self-supervised
+
+- name: Weakly Supervised Sementic Segmentation
+  link: https://arxiv.org/abs/1512.04150
+  image: https://149695847.v2.pressablecdn.com/wp-content/uploads/2018/07/37696877835_a0f8f4dbbe_b-1.jpg
+  description: WSSS
+
+- name: Medical Imaging
+  link: https://en.wikipedia.org/wiki/Medical_imaging
+  image: https://www.researchgate.net/publication/310898361/figure/fig1/AS:960047765020673@1605904632079/From-left-to-right-T1-T2-and-FLAIR-weighted-conventional-top-row-and-synthetic.gif
+  description: MRI, CT, X-ray, Ultrasound, PET, SPECT, OCT, etc.
+  
+- name: Vision projects
+  link:
+  image: https://cdn.pixabay.com/photo/2016/12/02/02/10/idea-1876659_960_720.jpg
+  description: To be updated
+

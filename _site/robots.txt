@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: http://seilk.github.io/sitemap.xml
