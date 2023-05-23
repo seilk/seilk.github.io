@@ -18,7 +18,7 @@ layout: compress
   <span class="bar"></span>
   <section class="hero is-fullheight has-text-centered" id="post">
     <div class="hero-body">
-      <div class="container" style="max-width: 87%;">
+      <div class="container" style="max-width: 85%;">
         <a href="{{page.url | relative_url}}" class="has-text-black" id="title">
           <h1 class="title has-text-centered is-2 has-text-weight-semibold ">{{page.title}}</h1>
         </a>
@@ -62,12 +62,12 @@ layout: compress
             - https://devinlife.com/
             - https://github.com/allejo/jekyll-toc
             -->
-            <aside class="sidebar__right sticky" style="height: auto !important;">
-                <div class="toc">
-                    {% include toc.html html=content sanitize=true h_min=1 h_max=3 %}
+            <aside class="sidebar__right sticky toc-sidebar" style="height: auto !important;">
+                <div class="toc-sidebar">
+                {% include toc.html html=content sanitize=true h_min=1 h_max=3 %}
                 </div>
             </aside>
-            
+            {% include toc.html html=content sanitize=true class="inline_toc" id="my_toc" h_min=1 h_max=3%}
           <p>{{ content }}</p>
         </div>
         
