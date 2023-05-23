@@ -855,43 +855,46 @@ refer from
 
 .inline_toc {
     background-color: rgba(255, 255, 255, 0);
-    border: 1px solid transparent;
+    border: 2px solid transparent;
     border-radius: 4px;
     -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.125);
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.125);
+    box-shadow: 0 0px 0px rgba(0, 0, 0, 0.125);
     width: 100%;
     font-size: 1.2em;
     text-align: left;
+    clear: both;
+    display: block;
+    list-style: none;
     
-    ul {
-        margin: 0 auto;
-        padding: 0;
-        margin-bottom: 1px;
-        list-style: none;
-        }
+    // ul {
+    //     margin: 0 auto;
+    //     padding: 0;
+    //     margin-bottom: 1px;
+    //     list-style: none;
+    //     }
     
     ul>li{
         padding:0;
         margin: 0 auto;
         }
 
-    li {
-        padding: 1em 0px 0px 0px;
-        list-style: none;
+    // li {
+    //     padding: 1em 0px 0px 0px;
+    //     list-style: none;
 
-    }
+    // }
     li>a {
-        margin-top: .5em;
+        margin-top: .2em;
         display: block;
     }
 
-    li>a+ul {
-        margin-top: 0em;
-    }
+    // li>a+ul {
+    //     margin-top: 0em;
+    // }
 
-    ul>li{
-        margin-top: 0em;
-    }
+    // ul>li{
+    //     margin-top: 0em;
+    // }
 
     }
 

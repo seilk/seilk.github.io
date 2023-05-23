@@ -62,13 +62,22 @@ layout: compress
             - https://devinlife.com/
             - https://github.com/allejo/jekyll-toc
             -->
+            <!-- <aside class="sidebar__right sticky toc-sidebar" style="height: auto !important;">
+                <div class="toc-sidebar">
+                {% include toc.html html=content sanitize=true h_min=1 h_max=4 %}
+                </div>
+            </aside> -->
+            <div class="inline_toc">
+                {% include toc.html html=content sanitize=true class="inline_toc" id="my_toc" h_min=1 h_max=4%}
+            </div>
+          <p>
             <aside class="sidebar__right sticky toc-sidebar" style="height: auto !important;">
                 <div class="toc-sidebar">
-                {% include toc.html html=content sanitize=true h_min=1 h_max=3 %}
+                    {% include toc.html html=content sanitize=true h_min=1 h_max=4 %}
                 </div>
             </aside>
-            {% include toc.html html=content sanitize=true class="inline_toc" id="my_toc" h_min=1 h_max=3%}
-          <p>{{ content }}</p>
+            {{ content }}</p>
+
         </div>
         
       </div>
