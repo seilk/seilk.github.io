@@ -6,9 +6,915 @@
     <description>Personal portfolio/Diary</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000https://junia3.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 01 Jun 2023 12:03:01 +0900</pubDate>
-    <lastBuildDate>Thu, 01 Jun 2023 12:03:01 +0900</lastBuildDate>
+    <pubDate>Fri, 02 Jun 2023 12:34:42 +0900</pubDate>
+    <lastBuildDate>Fri, 02 Jun 2023 12:34:42 +0900</lastBuildDate>
     <generator>Jekyll v4.3.2</generator>
+    
+      <item>
+        <title></title>
+        <description>&lt;p&gt;A notebook version of this post can be found &lt;a href=&quot;https://github.com/hadrienj/Preprocessing-for-deep-learning&quot;&gt;here&lt;/a&gt; on Github.&lt;/p&gt;
+
+&lt;p&gt;The goal of this post/notebook is to go from the basics of data preprocessing to modern techniques used in deep learning. My point is that we can use code (Python/Numpy etc.) to better understand abstract mathematical notions! Thinking by coding! 💥&lt;/p&gt;
+
+&lt;p&gt;We will start with basic but very useful concepts in data science and machine learning/deep learning like variance and covariance matrix and we will go further to some preprocessing techniques used to feed images into neural networks. We will try to get more concrete insights using code to actually see what each equation is doing!&lt;/p&gt;
+
+&lt;p&gt;We call preprocessing all transformations on the raw data before it is fed to the machine learning or deep learning algorithm. For instance, training a convolutional neural network on raw images will probably lead to bad classification performances (&lt;a href=&quot;https://ieeexplore.ieee.org/document/7808140/&quot;&gt;Pal &amp;amp; Sudeep, 2016&lt;/a&gt;). The preprocessing is also important to speed up training (for instance, centering and scaling techniques, see &lt;a href=&quot;http://yann.lecun.com/exdb/publis/pdf/lecun-98b.pdf&quot;&gt;Lecun et al., 2012; see 4.3&lt;/a&gt;).&lt;/p&gt;
+
+&lt;p&gt;Here is the syllabus of this tutorial:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Background&lt;/strong&gt;: In the first part, we will get some reminders about variance and covariance and see how to generate and plot fake data to get a better understanding of these concepts.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Preprocessing&lt;/strong&gt;: In the second part, we will see the basics of some preprocessing techniques that can be applied to any kind of data: mean normalization, standardisation and whitening.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Whitening images&lt;/strong&gt;: In the third part, we will use the tools and concepts gained in 1. and 2. to do a special kind of whitening called Zero Component Analysis (ZCA). It can be used to preprocess images for deep learning. This part will be very practical and fun ☃️!&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Feel free to fork the notebook. For instance, check the shapes of the matrices each time you have a doubt :)&lt;/p&gt;
+
+&lt;h1 id=&quot;1-background&quot;&gt;1. Background&lt;/h1&gt;
+
+&lt;h2 id=&quot;a-variance-and-covariance&quot;&gt;A. Variance and covariance&lt;/h2&gt;
+
+&lt;p&gt;The variance of a variable describes how much the values are spread. The covariance is a measure that tells the amount of dependency between two variables. A positive covariance means that values of the first variable are large when values of the second variables are also large. A negative covariance means the opposite: large values from one variable are associated with small values of the other. The covariance value depends on the scale of the variable so it is hard to analyse it. It is possible to use the correlation coefficient that is easier to interpret. It is just the covariance normalized.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../../assets/img/Preprocessing-for-deep-learning/negative-and-positive-covariance.png&quot; width=&quot;500&quot; alt=&quot;Intuition about the covariance between two variables&quot; title=&quot;Representation of the covariance between two variables.&quot; /&gt;
+&lt;em&gt;A positive covariance means that large values of one variable are associated with big values from the other (left). A negative covariance means that large values of one variable are associated with small values of the other one (right).&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;The covariance matrix is a matrix that summarizes the variances and covariances of a set of vectors and it can tell a lot of things about your variables. The diagonal corresponds to the variance of each vector:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../../assets/img/Preprocessing-for-deep-learning/covariance1.png&quot; width=&quot;400&quot; alt=&quot;Variance in the matrix of covariance&quot; title=&quot;Variance in the matrix of covariance is on the diagonal&quot; /&gt;
+&lt;em&gt;A matrix $\boldsymbol{A}$ and its matrix of covariance. The diagonal corresponds to the variance of each column vector.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Let’s just check with the formula of the variance:&lt;/p&gt;
+
+&lt;div&gt;
+$
+V(\boldsymbol{X}) = \frac{1}{n}\sum_{i=1}^{n}(x_i-\bar{x})^2
+$
+&lt;/div&gt;
+
+&lt;p&gt;with $n$ the length of the vector, and $\bar{x}$ the mean of the vector. For instance, the variance of the first column vector of $\boldsymbol{A}$ is:&lt;/p&gt;
+
+&lt;div&gt;
+$
+V(\boldsymbol{A}_{:,1}) = \frac{(1-3)^2+(5-3)^2+(3-3)^2}{3} = 2.67
+$
+&lt;/div&gt;
+
+&lt;p&gt;This is the first cell of our covariance matrix. The second element on the diagonal corresponds of the variance of the second column vector from $\boldsymbol{A}$ and so on.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Note&lt;/em&gt;: the vectors extracted from the matrix $\boldsymbol{A}$ correspond to the columns of $\boldsymbol{A}$.&lt;/p&gt;
+
+&lt;h3 id=&quot;covariance&quot;&gt;Covariance&lt;/h3&gt;
+
+&lt;p&gt;The other cells correspond to the covariance between two column vectors from $\boldsymbol{A}$. For instance, the covariance between the first and the third column is located in the covariance matrix as the column 1 and the row 3 (or the column 3 and the row 1).&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../../assets/img/Preprocessing-for-deep-learning/covariance2.png&quot; width=&quot;400&quot; alt=&quot;Covariance in the matrix of covariance&quot; title=&quot;The position in the covariance matrix.&quot; /&gt;
+&lt;em&gt;The position in the covariance matrix. Column corresponds to the first variable and row to the second (or the opposite). The covariance between the first and the third column vector of $\boldsymbol{A}$ is the element in column 1 and row 3 (or the opposite = same value).&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Let’s check that the covariance between the first and the third column vector of $\boldsymbol{A}$ is equal to $-2.67$. The formula of the covariance between two variables $\boldsymbol{X}$ and $\boldsymbol{Y}$ is:&lt;/p&gt;
+
+&lt;div&gt;
+$
+cov(\boldsymbol{X},\boldsymbol{Y}) = \frac{1}{n} \sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y})
+$
+&lt;/div&gt;
+
+&lt;p&gt;The variables $\boldsymbol{X}$ and $\boldsymbol{Y}$ are the first and the third column vectors in the last example. Let’s split this formula to be sure that it is crystal clear:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;$(x_1-\bar{x})$. The sum symbol means that we will iterate on the elements of the vectors. We will start with the first element ($i=1$) and calculate the first element of $\boldsymbol{X}$ minus the mean of the vector $\boldsymbol{X}$.&lt;/li&gt;
+  &lt;li&gt;$(x_1-\bar{x})(y_1-\bar{y})$. Multiply the result with the first element of $\boldsymbol{Y}$ minus the mean of the vector $\boldsymbol{Y}$.&lt;/li&gt;
+  &lt;li&gt;$\sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y})$. Reiterate the process for each element of the vectors and calculate the sum of all results.&lt;/li&gt;
+  &lt;li&gt;$\frac{1}{n} \sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y})$. Divide by the number of elements in the vector.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h4 id=&quot;example-1&quot;&gt;Example 1.&lt;/h4&gt;
+
+&lt;p&gt;Let’s start with the matrix $\boldsymbol{A}$:&lt;/p&gt;
+
+&lt;div&gt;
+$
+\boldsymbol{A}=
+\begin{bmatrix}
+    1 &amp;amp; 3 &amp;amp; 5 \\\
+    5 &amp;amp; 4 &amp;amp; 1 \\\
+    3 &amp;amp; 8 &amp;amp; 6
+\end{bmatrix}
+$
+&lt;/div&gt;
+
+&lt;p&gt;We will calculate the covariance between the first and the third column vectors:&lt;/p&gt;
+
+&lt;div&gt;
+$
+\boldsymbol{X} = \begin{bmatrix}
+    1 \\\
+    5 \\\
+    3
+\end{bmatrix}
+$
+&lt;/div&gt;
+
+&lt;p&gt;and&lt;/p&gt;
+
+&lt;div&gt;
+$\boldsymbol{Y} = \begin{bmatrix}
+    5 \\\
+    1 \\\
+    6
+\end{bmatrix}
+$
+&lt;/div&gt;
+
+&lt;p&gt;$\boldsymbol{\bar{x}}=3$, $\boldsymbol{\bar{y}}=4$ and $n=3$ so we have:&lt;/p&gt;
+
+&lt;div&gt;
+$
+cov(X,Y) = \frac{(1-3)(5-4)+(5-3)(1-4)+(3-3)(6-4)}{3}=\frac{-8}{3}=-2.67
+$
+&lt;/div&gt;
+
+&lt;p&gt;Ok, great! That the value of the covariance matrix.&lt;/p&gt;
+
+&lt;p&gt;Now the easy way! With Numpy, the covariance matrix can be calculated with the function &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;np.cov&lt;/code&gt;. It is worth noting that if you want Numpy to use the columns as vectors, the parameter &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;rowvar=False&lt;/code&gt; has to be used. Also, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;bias=True&lt;/code&gt; allows to divide by $n$ and not by $n-1$.&lt;/p&gt;
+
+&lt;p&gt;Let’s create the array first:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;8&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]])&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+array([[1, 3, 5],
+       [5, 4, 1],
+       [3, 8, 6]])
+&lt;/pre&gt;
+
+&lt;p&gt;Now we will calculate the covariance with the Numpy function:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cov&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rowvar&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bias&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+array([[ 2.66666667,  0.66666667, -2.66666667],
+       [ 0.66666667,  4.66666667,  2.33333333],
+       [-2.66666667,  2.33333333,  4.66666667]])
+&lt;/pre&gt;
+
+&lt;p&gt;Looks good!&lt;/p&gt;
+
+&lt;h3 id=&quot;finding-the-covariance-matrix-with-the-dot-product&quot;&gt;Finding the covariance matrix with the dot product&lt;/h3&gt;
+
+&lt;p&gt;There is another way to compute the covariance matrix of $\boldsymbol{A}$. You can center $
+\boldsymbol{A}$ around 0 (subtract the mean of the vector to each element of the vector to have a vector of mean equal to 0, &lt;em&gt;cf&lt;/em&gt;. below), multiply it with its own transpose and divide by the number of observations. Let’s start with an implementation and then we’ll try to understand the link with the previous equation:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;calculateCovariance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;meanX&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;axis&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;lenX&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;X&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;X&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;meanX&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;covariance&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lenX&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;covariance&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Let’s test it on our matrix $\boldsymbol{A}$:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;calculateCovariance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+array([[ 2.66666667,  0.66666667, -2.66666667],
+       [ 0.66666667,  4.66666667,  2.33333333],
+       [-2.66666667,  2.33333333,  4.66666667]])
+&lt;/pre&gt;
+
+&lt;p&gt;We end up with the same result as before!&lt;/p&gt;
+
+&lt;p&gt;The explanation is simple. The dot product between two vectors can be expressed:&lt;/p&gt;
+
+&lt;div&gt;
+$
+\boldsymbol{X^\text{T}Y}= \sum_{i=1}^{n}(x_i)(y_i)
+$
+&lt;/div&gt;
+
+&lt;p&gt;That’s right, it is the sum of the products of each element of the vectors:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../../assets/img/Preprocessing-for-deep-learning/dot-product.png&quot; width=&quot;400&quot; alt=&quot;The dot product corresponds to the sum of the products of each elements of the vectors&quot; title=&quot;The dot product.&quot; /&gt;
+&lt;em&gt;The dot product corresponds to the sum of the products of each element of the vectors.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;If $n$ is the number of elements in our vectors and that we divide by $n$:&lt;/p&gt;
+
+&lt;div&gt;
+$
+\frac{1}{n}\boldsymbol{X^\text{T}Y}= \frac{1}{n}\sum_{i=1}^{n}(x_i)(y_i)
+$
+&lt;/div&gt;
+
+&lt;p&gt;You can note that this is not too far from the formula of the covariance we have seen above:&lt;/p&gt;
+
+&lt;div&gt;
+$
+cov(\boldsymbol{X},\boldsymbol{Y}) = \frac{1}{n} \sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y})
+$
+&lt;/div&gt;
+
+&lt;p&gt;The only difference is that in the covariance formula we subtract the mean of a vector to each of its elements. This is why we need to center the data before doing the dot product.&lt;/p&gt;
+
+&lt;p&gt;Now if we have a matrix $\boldsymbol{A}$, the dot product between $\boldsymbol{A}$ and its transpose will give you a new matrix:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../../assets/img/Preprocessing-for-deep-learning/covariance-dot-product.png&quot; width=&quot;400&quot; alt=&quot;Covariance matrix and dot product&quot; title=&quot;Covariance matrix and dot product.&quot; /&gt;
+&lt;em&gt;If you start with a zero-centered matrix, the dot product between this matrix and its transpose will give you the variance of each vector and covariance between them, that is to say the covariance matrix.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;This is the covariance matrix! 🌵&lt;/p&gt;
+
+&lt;h2 id=&quot;b-visualize-data-and-covariance-matrices&quot;&gt;B. Visualize data and covariance matrices&lt;/h2&gt;
+
+&lt;p&gt;In order to get more insights about the covariance matrix and how it can be useful, we will create a function used to visualize it along with 2D data. You will be able to see the link between the covariance matrix and the data.&lt;/p&gt;
+
+&lt;p&gt;This function will calculate the covariance matrix as we have seen above. It will create two subplots: one for the covariance matrix and one for the data. The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;heatmap&lt;/code&gt; function from Seaborn is used to create gradients of color: small values will be colored in light green and large values in dark blue. The data is represented as a scatterplot. We choose one of our palette colors, but you may prefer other colors 🌈.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;plotDataAndCov&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ACov&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cov&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rowvar&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bias&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&apos;Covariance matrix:&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ACov&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;fig&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ax&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;subplots&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nrows&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ncols&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;fig&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;set_size_inches&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;ax0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;subplot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;# Choosing the colors
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;cmap&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sns&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;color_palette&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;GnBu&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;sns&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;heatmap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ACov&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cmap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cmap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vmin&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;ax1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;subplot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;# data can include the colors
+&lt;/span&gt;    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;==&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;#0A98BE&quot;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ax1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;scatter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;40&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;# Remove the top and right axes from the data plot
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;ax1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;spines&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;right&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;set_visible&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ax1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;spines&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;top&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;set_visible&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;c-simulating-data&quot;&gt;C. Simulating data&lt;/h2&gt;
+
+&lt;h3 id=&quot;uncorrelated-data&quot;&gt;Uncorrelated data&lt;/h3&gt;
+
+&lt;p&gt;Now that we have the plot function, we will generate some random data to visualize what the covariance matrice can tell us. We will start with some data drawn from a normal distribution with the Numpy function &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;np.random.normal()&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../../assets/img/Preprocessing-for-deep-learning/np.random.normal.png&quot; width=&quot;400&quot; alt=&quot;Parameters of numpy random normal&quot; title=&quot;Parameters of Numpy random normal.&quot; /&gt;
+&lt;em&gt;Drawing sample from a normal distribution with Numpy.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;This function needs the mean, the standard deviation and the number of observations of the distribution as input. We will create two random variables of 300 observations with a standard deviation of 1. The first will have a mean of 1 and the second a mean of 2. If we draw two times 300 observations from a normal distribution, both vectors will be uncorrelated.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;seed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1234&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;a1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;normal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;300&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;a2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;normal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;300&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+(300, 2)
+&lt;/pre&gt;
+
+&lt;p&gt;&lt;em&gt;Note 1&lt;/em&gt;:  We transpose the data with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.T&lt;/code&gt; because the original shape is (2, 300) and we want the number of observations as rows (so with shape (300, 2)).&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Note 2&lt;/em&gt;: We use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;np.random.seed&lt;/code&gt; function for reproducibility. The same random number will be used the next time we run the cell!&lt;/p&gt;
+
+&lt;p&gt;Let’s check how the data looks like:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,:]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+array([[ 2.47143516,  1.52704645],
+       [ 0.80902431,  1.7111124 ],
+       [ 3.43270697,  0.78245452],
+       [ 1.6873481 ,  3.63779121],
+       [ 1.27941127, -0.74213763],
+       [ 2.88716294,  0.90556519],
+       [ 2.85958841,  2.43118375],
+       [ 1.3634765 ,  1.59275845],
+       [ 2.01569637,  1.1702969 ],
+       [-0.24268495, -0.75170595]])
+&lt;/pre&gt;
+
+&lt;p&gt;Nice, we have our two columns vectors.&lt;/p&gt;
+
+&lt;p&gt;Now, we can check that the distributions are normal:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;sns&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;distplot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;#53BB04&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;sns&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;distplot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;#0A98BE&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;../../assets/img/Preprocessing-for-deep-learning/Preprocessing-for-deep-learning_24_0.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Looks good! We can see that the distributions have equivalent standard deviations but different means (1 and 2). So that’s exactly what we have asked for!&lt;/p&gt;
+
+&lt;p&gt;Now we can plot our dataset and its covariance matrix with our function:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;plotDataAndCov&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+Covariance matrix:
+[[ 0.95171641 -0.0447816 ]
+ [-0.0447816   0.87959853]]
+&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&quot;../../assets/img/Preprocessing-for-deep-learning/Preprocessing-for-deep-learning_27_1.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We can see on the scatterplot that the two dimensions are uncorrelated. Note that we have one dimension with a mean of 1 and the other with the mean of 2. Also, the covariance matrix shows that the variance of each variable is very large (around 1) and the covariance of columns 1 and 2 is very small (around 0). Since we insured that the two vectors are independent this is coherent (the opposite is not necessarily true: a covariance of 0 doesn’t guaranty independency (see &lt;a href=&quot;https://stats.stackexchange.com/questions/12842/covariance-and-independence&quot;&gt;here&lt;/a&gt;).&lt;/p&gt;
+
+&lt;h3 id=&quot;correlated-data&quot;&gt;Correlated data&lt;/h3&gt;
+
+&lt;p&gt;Now, let’s construct dependent data by specifying one column from the other one.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;seed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1234&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;b1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;normal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;300&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;b2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;normal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;300&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;2.&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;B&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plotDataAndCov&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;B&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+Covariance matrix:
+[[ 0.95171641  0.92932561]
+ [ 0.92932561  1.12683445]]
+&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&quot;../../assets/img/Preprocessing-for-deep-learning/Preprocessing-for-deep-learning_30_1.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The correlation between the two dimensions is visible on the scatter plot. We can see that a line could be drawn and used to predict $\boldsymbol{y}$ from $\boldsymbol{x}$ and vice versa. The covariance matrix is not diagonal (there are non-zero cells outside of the diagonal). That means that the covariance between dimensions is non-zero.&lt;/p&gt;
+
+&lt;p&gt;That’s great! ⚡️ We now have all the tools to see different preprocessing techniques.&lt;/p&gt;
+
+&lt;h1 id=&quot;2-preprocessing&quot;&gt;2. Preprocessing&lt;/h1&gt;
+
+&lt;h2 id=&quot;a-mean-normalization&quot;&gt;A. Mean normalization&lt;/h2&gt;
+
+&lt;p&gt;Mean normalization is just removing the mean from each observation.&lt;/p&gt;
+
+&lt;div&gt;
+$
+\boldsymbol{X&apos;} = \boldsymbol{X} - \bar{x}
+$
+&lt;/div&gt;
+
+&lt;p&gt;where $\boldsymbol{X’}$ is the normalized dataset, $\boldsymbol{X}$ the original dataset and $\bar{x}$ the mean of $\boldsymbol{X}$.&lt;/p&gt;
+
+&lt;p&gt;It will have the effect of centering the data around 0. We will create the function &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;center()&lt;/code&gt; to do that:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;center&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;newX&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;X&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;axis&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;newX&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Let’s give it a try with the matrix $\boldsymbol{B}$ we have created above:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;BCentered&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;center&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;B&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&apos;Before:&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;plotDataAndCov&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;B&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&apos;After:&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;plotDataAndCov&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BCentered&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+Before:
+
+
+Covariance matrix:
+[[ 0.95171641  0.92932561]
+ [ 0.92932561  1.12683445]]
+&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&quot;../../assets/img/Preprocessing-for-deep-learning/Preprocessing-for-deep-learning_35_1.png&quot; /&gt;&lt;/p&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+After:
+
+
+Covariance matrix:
+[[ 0.95171641  0.92932561]
+ [ 0.92932561  1.12683445]]
+&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&quot;../../assets/img/Preprocessing-for-deep-learning/Preprocessing-for-deep-learning_35_3.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The first plot shows again the original data $\boldsymbol{B}$ and the second plot shows the centered data (look at the scale).&lt;/p&gt;
+
+&lt;h2 id=&quot;b-standardization&quot;&gt;B. Standardization&lt;/h2&gt;
+
+&lt;p&gt;The standardization is used to put all features on the same scale. The way to do it is to divide each zero-centered dimension by its standard deviation.&lt;/p&gt;
+
+&lt;div&gt;
+$
+\boldsymbol{X&apos;} = \frac{\boldsymbol{X} - \bar{x}}{\sigma_{\boldsymbol{X}}}
+$
+&lt;/div&gt;
+
+&lt;p&gt;where $\boldsymbol{X’}$ is the standardized dataset, $\boldsymbol{X}$ the original dataset, $\bar{x}$ the mean of $\boldsymbol{X}$ and $\sigma_{\boldsymbol{X}}$ the standard deviation of $\boldsymbol{X}$.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;standardize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;newX&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;center&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;axis&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;newX&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Let’s create another dataset with a different scale to check that it is working.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;seed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1234&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;normal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;300&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;normal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;300&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;2.&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;plotDataAndCov&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xlim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;15&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ylim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;15&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+Covariance matrix:
+[[ 0.95171641  0.83976242]
+ [ 0.83976242  6.22529922]]
+&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&quot;../../assets/img/Preprocessing-for-deep-learning/Preprocessing-for-deep-learning_40_1.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We can see that the scales of $x$ and $y$ are different. Note also that the correlation seems smaller because of the scale differences. Now let’s standardise it:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;CStandardized&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;standardize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;plotDataAndCov&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CStandardized&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+Covariance matrix:
+[[ 1.          0.34500274]
+ [ 0.34500274  1.        ]]
+&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&quot;../../assets/img/Preprocessing-for-deep-learning/Preprocessing-for-deep-learning_42_1.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Looks good! You can see that the scales are the same and that the dataset is zero-centered according to both axes. Now, have a look at the covariance matrix: you can see that the variance of each coordinate (the top-left cell and the bottom-right cell) is equal to 1. By the way, this new covariance matrix is actually the correlation matrix!💥 The Pearson correlation coefficient between the two variables ($\boldsymbol{c}_1$ and $\boldsymbol{c}_2$) is 0.54220151.&lt;/p&gt;
+
+&lt;h2 id=&quot;c-whitening&quot;&gt;C. Whitening&lt;/h2&gt;
+
+&lt;p&gt;Whitening or sphering data means that we want to transform it in a way to have a covariance matrix that is the identity matrix (1 in the diagonal and 0 for the other cells; &lt;a href=&quot;https://hadrienj.github.io/posts/Deep-Learning-Book-Series-2.3-Identity-and-Inverse-Matrices/&quot;&gt;more details on the identity matrix&lt;/a&gt;). It is called whitening in reference to white noise.&lt;/p&gt;
+
+&lt;p&gt;We now have all the tools that we need to do it. It involves the following steps:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;1- Zero-center the data
+2- Decorrelate the data
+3- Rescale the data
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Let’s take again $\boldsymbol{C}$ and try to do these steps.&lt;/p&gt;
+
+&lt;h4 id=&quot;1-zero-centering&quot;&gt;1. Zero-centering&lt;/h4&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;CCentered&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;center&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;plotDataAndCov&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CCentered&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+Covariance matrix:
+[[ 0.95171641  0.83976242]
+ [ 0.83976242  6.22529922]]
+&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&quot;../../assets/img/Preprocessing-for-deep-learning/Preprocessing-for-deep-learning_45_1.png&quot; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;2-decorrelate&quot;&gt;2. Decorrelate&lt;/h4&gt;
+
+&lt;p&gt;At this point, we need to decorrelate our data. Intuitively, it means that we want to rotate the data until there is no correlation anymore. Look at the following cartoon to see what I mean:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../../assets/img/Preprocessing-for-deep-learning/rotation.png&quot; width=&quot;500&quot; alt=&quot;Rotation to decorrelate the data&quot; title=&quot;The rotation can decorrelate the data.&quot; /&gt;
+&lt;em&gt;The left plot shows correlated data. For instance, if you take a data point with a big $x$ value, chances are that $y$ will also be quite big. Now take all data points and do a rotation (maybe around 45 degrees counterclockwise): the new data (plotted on the right) is not correlated anymore.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;The question is: how could we find the right rotation in order to get the uncorrelated data? Actually, it is exactly what the &lt;strong&gt;eigenvectors&lt;/strong&gt; of the covariance matrix do: they indicate the direction where the spread of the data is at its maximum:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../../assets/img/Preprocessing-for-deep-learning/maxVar.png&quot; width=&quot;300&quot; alt=&quot;Direction where the variance is maximum&quot; title=&quot;There is one direction where the variance is maximum.&quot; /&gt;
+&lt;em&gt;The eigenvectors of the covariance matrix give you the direction that maximizes the variance. The direction of the green line is where the variance is maximum. Just look at the smallest and largest point projected on this line: the spread is big. Compare that with the projection on the orange line: the spread is very small.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;For more details about the eigendecomposition, see &lt;a href=&quot;https://hadrienj.github.io/posts/Deep-Learning-Book-Series-2.7-Eigendecomposition/&quot;&gt;this post&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;So we can decorrelate the data by projecting it on the eigenvectors basis. This will have the effect to apply the rotation needed and remove correlations between the dimensions. Here are the steps:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;1- Calculate the covariance matrix
+2- Calculate the eigenvectors of the covariance matrix
+3- Apply the matrix of eigenvectors to the data (this will apply the rotation)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Let’s pack that into a function:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;decorrelate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;XCentered&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;center&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;cov&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;XCentered&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;XCentered&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;XCentered&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;# Calculate the eigenvalues and eigenvectors of the covariance matrix
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;eigVals&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;eigVecs&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;linalg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;eig&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cov&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;# Apply the eigenvectors to X
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;decorrelated&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;eigVecs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;decorrelated&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Let’s try to decorrelate our zero-centered matrix $\boldsymbol{C}$ to see it in action:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;plotDataAndCov&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;CDecorrelated&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;decorrelate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plotDataAndCov&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CDecorrelated&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xlim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ylim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+Covariance matrix:
+[[ 0.95171641  0.83976242]
+ [ 0.83976242  6.22529922]]
+&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&quot;../../assets/img/Preprocessing-for-deep-learning/Preprocessing-for-deep-learning_49_1.png&quot; /&gt;&lt;/p&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+Covariance matrix:
+[[  5.96126981e-01  -1.48029737e-16]
+ [ -1.48029737e-16   3.15205774e+00]]
+&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&quot;../../assets/img/Preprocessing-for-deep-learning/Preprocessing-for-deep-learning_49_3.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Nice! This is working 🎄&lt;/p&gt;
+
+&lt;p&gt;We can see that the correlation is not here anymore and that the covariance matrix (now a diagonal matrix) confirms that the covariance between the two dimensions is equal to 0.&lt;/p&gt;
+
+&lt;h4 id=&quot;3-rescale-the-data&quot;&gt;3. Rescale the data&lt;/h4&gt;
+
+&lt;p&gt;The next step is to scale the uncorrelated matrix in order to obtain a covariance matrix corresponding to the identity matrix (ones on the diagonal and zeros on the other cells). To do that we scale our decorrelated data by dividing each dimension by the square-root of its corresponding eigenvalue.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;whiten&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;XCentered&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;center&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;cov&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;XCentered&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;XCentered&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;XCentered&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;# Calculate the eigenvalues and eigenvectors of the covariance matrix
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;eigVals&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;eigVecs&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;linalg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;eig&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cov&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;# Apply the eigenvectors to X
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;decorrelated&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;eigVecs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;# Rescale the decorrelated data
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;whitened&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;decorrelated&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;eigVals&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1e-5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;whitened&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;em&gt;Note:&lt;/em&gt; we add a small value (here $10^{-5}$) to avoid the division by $0$.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;CWhitened&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;whiten&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;plotDataAndCov&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CWhitened&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xlim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ylim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+Covariance matrix:
+[[  9.99983225e-01  -1.06581410e-16]
+ [ -1.06581410e-16   9.99996827e-01]]
+&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&quot;../../assets/img/Preprocessing-for-deep-learning/Preprocessing-for-deep-learning_54_1.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Hooray! We can see that with the covariance matrix that this is all good. We have something that really looks to the identity matrix ($1$ on the diagonal and $0$ elsewhere). 🌵&lt;/p&gt;
+
+&lt;h1 id=&quot;3-image-whitening&quot;&gt;3. Image whitening&lt;/h1&gt;
+
+&lt;p&gt;We will see how whitening can be applied to preprocess image dataset. To do so we will use the paper of &lt;a href=&quot;https://ieeexplore.ieee.org/document/7808140/&quot;&gt;Pal &amp;amp; Sudeep (2016)&lt;/a&gt; where they give some details about the process. This preprocessing technique is called Zero component analysis (ZCA).&lt;/p&gt;
+
+&lt;p&gt;Check out the paper, but here is the kind of result they got:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../../assets/img/Preprocessing-for-deep-learning/whitening-images-cifar10-pal-sudeep.png&quot; width=&quot;800&quot; alt=&quot;Whitening images from the CIFAR10 dataset. Results from the paper of Pal &amp;amp; Sudeep (2016).&quot; /&gt;
+&lt;em&gt;Whitening images from the CIFAR10 dataset. Results from the paper of Pal &amp;amp; Sudeep (2016). The original images (left) and the images after the ZCA (right) are shown.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;First thing first: we will load images from the CIFAR dataset. This dataset is available from Keras but you can also download it &lt;a href=&quot;https://www.cs.toronto.edu/~kriz/cifar.html&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;keras.datasets&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cifar10&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X_train&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y_train&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X_test&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y_test&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cifar10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;load_data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;X_train&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+(50000, 32, 32, 3)
+&lt;/pre&gt;
+
+&lt;p&gt;The training set of the CIFAR10 dataset contains 50000 images. The shape of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;X_train&lt;/code&gt; is (50000, 32, 32, 3). Each image is 32px by 32px and each pixel contains 3 dimensions (R, G, B). Each value is the brightness of the corresponding color between 0 and 255.&lt;/p&gt;
+
+&lt;p&gt;We will start by selecting only a subset of the images, let’s say 1000:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;X_train&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+(1000, 32, 32, 3)
+&lt;/pre&gt;
+
+&lt;p&gt;That’s better! Now we will reshape the array to have flat image data with one image per row. Each image will be (1, 3072) because $32 \times 32 \times 3 = 3072$. Thus, the array containing all images will be (1000, 3072):&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reshape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+(1000, 3072)
+&lt;/pre&gt;
+
+&lt;p&gt;The next step is to be able to see the images. The function &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;imshow()&lt;/code&gt; from Matplotlib (&lt;a href=&quot;https://matplotlib.org/api/_as_gen/matplotlib.pyplot.imshow.html&quot;&gt;doc&lt;/a&gt;) can be used to show images. It needs images with the shape ($M \times N \times 3$) so let’s create a function to reshape the images and be able to visualize them from the shape (1, 3072).&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;plotImage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;figure&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;figsize&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;1.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;imshow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reshape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;For instance, let’s plot one of the images we have loaded:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;plotImage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:])&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;../../assets/img/Preprocessing-for-deep-learning/Preprocessing-for-deep-learning_65_0.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Cute! 🌵&lt;/p&gt;
+
+&lt;p&gt;We can now implement the whitening of the images. &lt;a href=&quot;https://ieeexplore.ieee.org/document/7808140/&quot;&gt;Pal &amp;amp; Sudeep (2016)&lt;/a&gt; describe the process:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;The first step is to rescale the images to obtain the range [0, 1] by dividing by 255 (the maximum value of the pixels).&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Remind that the formula to obtain the range [0, 1] is:&lt;/p&gt;
+
+&lt;div&gt;
+$\frac{data - min(data)}{max(data) - min(data)}$
+&lt;/div&gt;
+
+&lt;p&gt;but here, the minimum value is 0, so this leads to:&lt;/p&gt;
+
+&lt;div&gt;
+$\frac{data}{max(data)} = \frac{data}{255}$
+&lt;/div&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;X_norm&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;X&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;255.&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&apos;X.min()&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;X_norm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;min&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&apos;X.max()&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;X_norm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+X.min() 0.0
+X.max() 1.0
+&lt;/pre&gt;
+
+&lt;h3 id=&quot;mean-subtraction-per-pixel-or-per-image&quot;&gt;Mean subtraction: per-pixel or per-image?&lt;/h3&gt;
+
+&lt;p&gt;Ok cool, the range of our pixel values is between 0 and 1 now. The next step is:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Subtract the mean from all image.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Be careful here 🌪🎢:&lt;/p&gt;
+
+&lt;p&gt;One way to do it is to take each image and remove the mean of this image from every pixel (&lt;a href=&quot;https://www.computer.org/csdl/proceedings/iccv/2009/4420/00/05459469.pdf&quot;&gt;Jarrett et al., 2009&lt;/a&gt;). The intuition behind this process is that it centers the pixels of each image around 0.&lt;/p&gt;
+
+&lt;p&gt;Another way to do it is to take each of the 3072 pixels that we have (32 by 32 pixels for R, G and B) for every image and subtract the mean of that pixel across all images. This is called per-pixel mean subtraction. This time, each pixel will be centered around 0 &lt;em&gt;according to all images&lt;/em&gt;. When you will feed your network with the images, each pixel is considered as a different feature. With the per-pixel mean subtraction, we have centered each feature (pixel) around 0. This technique is commonly used (e.g &lt;a href=&quot;http://proceedings.mlr.press/v28/wan13.html&quot;&gt;Wan et al., 2013&lt;/a&gt;).&lt;/p&gt;
+
+&lt;p&gt;We will now do the per-pixel mean subtraction from our 1000 images. Our data are organized with these dimensions (images, pixels). It was (1000, 3072) because there are 1000 images with $32 \times 32 \times 3 = 3072$ pixels. The mean per-pixel can thus be obtained from the first axis:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;X_norm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;axis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+(3072,)
+&lt;/pre&gt;
+
+&lt;p&gt;This gives us 3072 values which is the number of means: one per pixel. Let’s see the kind of values we have:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;X_norm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;axis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+array([ 0.5234    ,  0.54323137,  0.5274    , ...,  0.50369804,
+        0.50011765,  0.45227451])
+&lt;/pre&gt;
+
+&lt;p&gt;This is near 0.5 because we already have normalized to the range [0, 1]. However, we still need to remove the mean from each pixel:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;X_norm&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;X_norm&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;X_norm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;axis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Just to convince ourselves that it worked, we will compute the mean of the first pixel. Let’s hope that it is 0.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;X_norm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;axis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+array([ -5.30575583e-16,  -5.98021632e-16,  -4.23439062e-16, ...,
+        -1.81965554e-16,  -2.49800181e-16,   3.98570066e-17])
+&lt;/pre&gt;
+
+&lt;p&gt;This is not exactly 0 but it is small enough that we can consider that it worked! 🌵&lt;/p&gt;
+
+&lt;p&gt;Now we want to calculate the covariance matrix of the zero-centered data. Like we have seen above, we can calculate it with the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;np.cov()&lt;/code&gt; function from Numpy.&lt;/p&gt;
+
+&lt;p&gt;There are two possible correlation matrices that we can calculate from the matrix $\boldsymbol{X}$: either the correlation between rows or between columns. In our case, each row of the matrix $\boldsymbol{X}$ is an image, so the rows of the matrix correspond to the observations and the columns of the matrix corresponds to the features (the images pixels). We want to calculate the correlation between the pixels because the goal of the whitening is to remove these correlations to force the algorithm to focus on higher-order relations.&lt;/p&gt;
+
+&lt;p&gt;To do so, we will tell this to Numpy with the parameter &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;rowvar=False&lt;/code&gt; (see the &lt;a href=&quot;https://docs.scipy.org/doc/numpy/reference/generated/numpy.cov.html&quot;&gt;doc&lt;/a&gt;): it will use the columns as variables (or features) and the rows as observations.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;cov&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cov&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X_norm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rowvar&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The covariance matrix should have a shape of 3072 by 3072 to represent the correlation between each pair of pixels (and there are 3072 pixels):&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;cov&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+(3072, 3072)
+&lt;/pre&gt;
+
+&lt;p&gt;Now the magic part: we will calculate the singular values and vectors of the covariance matrix and use them to rotate our dataset. Have a look at &lt;a href=&quot;https://hadrienj.github.io/posts/Deep-Learning-Book-Series-2.8-Singular-Value-Decomposition/&quot;&gt;my post&lt;/a&gt; on the singular value decomposition if you need more details!&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;V&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;linalg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;svd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cov&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In the paper, they used the following equation:&lt;/p&gt;
+
+&lt;div&gt;
+$
+\boldsymbol{X}_{ZCA} = \boldsymbol{U}.diag(\frac{1}{\sqrt{diag(\boldsymbol{S}) + \epsilon}}).\boldsymbol{U^\text{T}.X}
+$
+&lt;/div&gt;
+
+&lt;p&gt;with $\boldsymbol{U}$ the left singular vectors, and $\boldsymbol{S}$ the singular values of the covariance of the initial normalized dataset of images and $\boldsymbol{X}$ the normalized dataset. $\epsilon$ (&lt;em&gt;epsilon&lt;/em&gt;) is an hyper-parameter called the whitening coefficient. $diag(a)$ corresponds to a matrix with the vector $a$ as a diagonal and 0 in all other cells.&lt;/p&gt;
+
+&lt;p&gt;We will try to implement this equation. Let’s start by checking the dimensions of the SVD:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+(3072, 3072) (3072,)
+&lt;/pre&gt;
+
+&lt;p&gt;$\boldsymbol{S}$ is a vector containing 3072 elements (the singular values). $diag(\boldsymbol{S})$ will thus be of shape (3072, 3072) with $\boldsymbol{S}$ as the diagonal:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;diag&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&apos;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;shape:&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;diag&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+[[  8.15846654e+00   0.00000000e+00   0.00000000e+00 ...,   0.00000000e+00
+    0.00000000e+00   0.00000000e+00]
+ [  0.00000000e+00   4.68234845e+00   0.00000000e+00 ...,   0.00000000e+00
+    0.00000000e+00   0.00000000e+00]
+ [  0.00000000e+00   0.00000000e+00   2.41075267e+00 ...,   0.00000000e+00
+    0.00000000e+00   0.00000000e+00]
+ ...,
+ [  0.00000000e+00   0.00000000e+00   0.00000000e+00 ...,   3.92727365e-05
+    0.00000000e+00   0.00000000e+00]
+ [  0.00000000e+00   0.00000000e+00   0.00000000e+00 ...,   0.00000000e+00
+    3.52614473e-05   0.00000000e+00]
+ [  0.00000000e+00   0.00000000e+00   0.00000000e+00 ...,   0.00000000e+00
+    0.00000000e+00   1.35907202e-15]]
+
+shape: (3072, 3072)
+&lt;/pre&gt;
+
+&lt;p&gt;$diag(\frac{1}{\sqrt{diag(\boldsymbol{S}) + \epsilon}})$ is also of shape (3072, 3072) as well as $\boldsymbol{U}$ and $\boldsymbol{U^{\text{T}}}$. We have seen also that $\boldsymbol{X}$ has the shape (1000, 3072) and we need to transpose it to have (3072, 1000). The shape of $\boldsymbol{X}_{ZCA}$ is thus:&lt;/p&gt;
+
+\[(3072, 3072) . (3072, 3072) . (1000, 3072)^{\text{T}} = (3072, 3072) . (3072, 1000) = (3072, 1000)\]
+
+&lt;p&gt;which corresponds to the shape of the initial dataset after transposition. Nice!&lt;/p&gt;
+
+&lt;p&gt;We have:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;epsilon&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.1&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;X_ZCA&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;diag&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;epsilon&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X_norm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Let’s rescale the images:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;X_ZCA_rescaled&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X_ZCA&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;X_ZCA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;min&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X_ZCA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;X_ZCA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;min&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&apos;min:&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;X_ZCA_rescaled&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;min&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&apos;max:&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;X_ZCA_rescaled&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;pre class=&quot;output&quot;&gt;
+min: 0.0
+max: 1.0
+&lt;/pre&gt;
+
+&lt;p&gt;Finally, we can look at the effect of whitening by comparing an image before and after whitening:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;plotImage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:])&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plotImage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X_ZCA_rescaled&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:])&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;../../assets/img/Preprocessing-for-deep-learning/Preprocessing-for-deep-learning_90_0.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../../assets/img/Preprocessing-for-deep-learning/Preprocessing-for-deep-learning_90_1.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Hooray! That’s great!⚡️It looks like the images from the paper &lt;a href=&quot;https://ieeexplore.ieee.org/document/7808140/&quot;&gt;Pal &amp;amp; Sudeep (2016)&lt;/a&gt;. They used &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;epsilon = 0.1&lt;/code&gt;. You can try other values to see the effect on the image.&lt;/p&gt;
+
+&lt;p&gt;That’s all! 🌴&lt;/p&gt;
+
+&lt;p&gt;I hope that you found something interesting in this article!&lt;/p&gt;
+
+&lt;p&gt;You can fork the Jupyter notebook on Github &lt;a href=&quot;https://github.com/hadrienj/Preprocessing-for-deep-learning&quot;&gt;here&lt;/a&gt;!&lt;/p&gt;
+
+&lt;h1 id=&quot;references&quot;&gt;References&lt;/h1&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.computer.org/csdl/proceedings/iccv/2009/4420/00/05459469.pdf&quot;&gt;K. Jarrett, K. Kavukcuoglu, M. Ranzato, and Y. LeCun, “What is the best multi-stage architecture for object recognition?,” in 2009 IEEE 12th International Conference on Computer Vision, 2009, pp. 2146–2153.
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.222.9220&amp;amp;rep=rep1&amp;amp;type=pdf&quot;&gt;A. Krizhevsky, “Learning Multiple Layers of Features from Tiny Images,” Master’s thesis, University of Tront, 2009.
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://yann.lecun.com/exdb/publis/pdf/lecun-98b.pdf&quot;&gt;Y. A. LeCun, L. Bottou, G. B. Orr, and K.-R. Müller, “Efficient BackProp,” in Neural Networks: Tricks of the Trade, Springer, Berlin, Heidelberg, 2012, pp. 9–48.
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://ieeexplore.ieee.org/document/7808140/&quot;&gt;K. K. Pal and K. S. Sudeep, “Preprocessing for image classification by convolutional neural networks,” in 2016 IEEE International Conference on Recent Trends in Electronics, Information Communication Technology (RTEICT), 2016, pp. 1778–1781.
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://proceedings.mlr.press/v28/wan13.html&quot;&gt;L. Wan, M. Zeiler, S. Zhang, Y. L. Cun, and R. Fergus, “Regularization of Neural Networks using DropConnect,” in International Conference on Machine Learning, 2013, pp. 1058–1066.
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;And also these great resources and QA:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Whitening_transformation&quot;&gt;Wikipedia - Whitening transformation&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://cs231n.github.io/neural-networks-2/&quot;&gt;CS231 - Convolutional Neural Networks for Visual Recognition&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://theclevermachine.wordpress.com/2013/03/30/the-statistical-whitening-transform/&quot;&gt;Dustin Stansbury - The Clever Machine&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.visiondummy.com/2014/04/geometric-interpretation-covariance-matrix/&quot;&gt;Some details about the covariance matrix&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://stackoverflow.com/questions/41635737/is-this-the-correct-way-of-whitening-an-image-in-python&quot;&gt;SO - Image whitening in Python&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://ufldl.stanford.edu/wiki/index.php/Data_Preprocessing&quot;&gt;Mean normalization per image or from the entire dataset&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://stackoverflow.com/questions/29743523/subtract-mean-from-image&quot;&gt;Mean subtraction - all images or per image?&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://yann.lecun.com/exdb/publis/pdf/lecun-98b.pdf&quot;&gt;Why centering is important - See section 4.3&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.kaggle.com/nicw102168/exploring-zca-and-color-image-whitening/notebook&quot;&gt;Kaggle kernel on ZCA&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/keras-team/keras-preprocessing/blob/b9d142456a64ef228475f07cb2f2d38fd05bd249/keras_preprocessing/image.py#L1254:L1257&quot;&gt;How ZCA is implemented in Keras&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Fri, 02 Jun 2023 12:34:42 +0900</pubDate>
+        <link>http://localhost:4000/blog/2011-01-01-wht</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/2011-01-01-wht</guid>
+        
+        <category></category>
+        
+        
+      </item>
     
       <item>
         <title>A Simple Framework for Contrastive Learning of Visual Representations</title>
@@ -954,7 +1860,7 @@ DG, UDG 분야는 데이터의 수준이 일관하고 그 안에서 이미지 �
 &lt;/blockquote&gt;
 
 &lt;p align=&quot;center&quot;&gt;
- &lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/dino1_1.png&quot; width=&quot;1000&quot; /&gt;
+ &lt;img src=&quot;/assets/img/paperreview/dino1_1.png&quot; width=&quot;700&quot; /&gt;
 &lt;em&gt;DINO의 정성적인(Qualitative) 결과(Figure 1)는 매우 뛰어나다. 객체의 디테일한 부분을 놓치지 않고 잡아내며 Computer Vision 분야에서의 Transformer의 위용을 다시 한번 보여줬다. 심지어 모델은 정답을 배우지 않은 no-supervision 훈련의 결과물이다.&lt;/em&gt;
 &lt;/p&gt;
 
@@ -967,7 +1873,7 @@ DG, UDG 분야는 데이터의 수준이 일관하고 그 안에서 이미지 �
 &lt;h2 id=&quot;1-main-results-imagenet-classification&quot;&gt;1. Main Results (ImageNet Classification)&lt;/h2&gt;
 
 &lt;p align=&quot;center&quot;&gt;
-&lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/dino1_2.png&quot; width=&quot;500&quot; /&gt;
+&lt;img src=&quot;/assets/img/paperreview/dino1_2.png&quot; width=&quot;500&quot; /&gt;
 &lt;/p&gt;
 
 &lt;p&gt;이 Table은 DINO 논문의 가장 핵심적인 성능 평가 Table입니다. Self-Supervised Learning에서는 보통 Foundation Model(Down-stream task를 수행하는 사전훈련된 모델)을 만드는것에 주안점을 둡니다.&lt;/p&gt;
@@ -986,7 +1892,7 @@ DG, UDG 분야는 데이터의 수준이 일관하고 그 안에서 이미지 �
 
 &lt;p&gt;논문의 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Appendix. A.&lt;/code&gt;에서도 DINO는 시간과 자원이 상대적으로 더 필요한 Linear Classifier보다 가볍고 빠른 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kNN&lt;/code&gt; 알고리즘에 유연성(flexibility)을 가진다고 설명합니다.&lt;/p&gt;
 &lt;p align=&quot;center&quot;&gt;
-&lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/dino1_3.png&quot; width=&quot;700&quot; /&gt;
+&lt;img src=&quot;/assets/img/paperreview/dino1_3.png&quot; width=&quot;700&quot; /&gt;
 &lt;em&gt;본문 : &quot;DINO might offer more model ﬂexibility that beneﬁts the k-NN evaluation. K-NN classiﬁers have the great advantage of being fast and light to deploy, &lt;u&gt;without requiring any domain adaptation.&lt;/u&gt; Overall, ViT trained with DINO provides features that combine particularly well with k-NN classiﬁers.&lt;/em&gt;
 &lt;/p&gt;
 &lt;p&gt;&lt;br /&gt;
@@ -1233,20 +2139,43 @@ Collapse는 다양한 형태로 나타날 수 있으며, 예를 들면 다음과
 
 &lt;p&gt;앞서 말한 Model Collapse를 해결하기 위해서 DINO에서는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Centering&lt;/code&gt;과 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Sharpening&lt;/code&gt; 기법을 사용합니다.&lt;/p&gt;
 
+&lt;p&gt;이전 Work들의 Avoiding Collapse의 방법으로 Contrastive loss, Clustering constraints, Predictor, Batch Normalization 등이 있는데, 
+DINO에서는 Teacher output의 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Centering&lt;/code&gt;과 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Sharpening&lt;/code&gt;을 해주는 것만으로 모델을 안정화(Stablization)할 수 있다고 설명합니다.&lt;/p&gt;
+
+&lt;p&gt;Centering은 Output이 한개의 차원에 지배적인(dominated) 상황을 억제하지만 Output이 Uniform distribution이 되도록 하는 특성을 가지고 있고 Sharpening은 그 반대의 특성을 가지고 있습니다.&lt;/p&gt;
+
 &lt;p&gt;[
  g_t(x) ← g_t(x) + c
 ]&lt;/p&gt;
 
-&lt;p&gt;이전 Work들의 Avoiding Collapse의 방법으로 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Contrastive loss&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Clustering constraints&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Predictor&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Batch Normalization&lt;/code&gt; 등이 있는데, 
-DINO에서는 Teacher output의 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Centering&lt;/code&gt;과 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Sharpening&lt;/code&gt;을 해주는 것만으로 모델을 안정화(Stablization)할 수 있다고 설명한다.&lt;/p&gt;
+&lt;p&gt;[
+c \leftarrow mc + (1 - m)\frac{1}{B} \sum^{B}_{i=1}g_{\theta_t}{(x_i)}
+]&lt;/p&gt;
 
-&lt;p&gt;Centering은 Output이 한개의 차원에 지배적인(dominated) 상황을 억제하지만 Output이 Uniform distribution이 되도록 하는 특성을 가지고 있고 Sharpening은 그 반대의 특성을 가지고 있다.&lt;/p&gt;
+&lt;p&gt;위 수식을 설명하자면 teacher parameter가 student model에 의해 &lt;u&gt;momentum update&lt;/u&gt; 가 된 후 추가로 $c$를 더해줌으로써 
+teacher parameter($g_{\theta_t}$)는 $c$에 의해 보정됩니다.&lt;/p&gt;
 
+&lt;p&gt;이 때 Centering 인자인 $c$도 &lt;u&gt;center_momentum&lt;/u&gt;에 의해 매 iteration마다 update됩니다. 
+$g_{\theta_t}$ 의 &lt;u&gt;배치 단위의 평균&lt;/u&gt;도 $c$ 업데이트에 적용 되면서 $c$ 또한 점차적으로 momentum updated $g_{\theta_t}$의 평균적인 값의 영향을 받는다고 할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;이렇게 되면 dynamic 하게 매 상황(momentum update)에 맞는 centering을 적용할 수 있게 된다는 것에 의미가 있다고 생각합니다.&lt;/strong&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot;&gt;
-&lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/dino1_12.png&quot; width=&quot;700&quot; /&gt;
+&lt;img src=&quot;https://seilk.github.io/assets/img/paperreview/dino_code1.png&quot; width=&quot;800&quot; /&gt;
+&lt;/p&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot;&gt;
+    &lt;img src=&quot;/assets/img/paperreview/dino1_code8.jpg&quot; width=&quot;800&quot; /&gt;
+    &lt;em&gt;Code 상에서의 Centering&lt;/em&gt;
 &lt;/p&gt;
 
-&lt;p&gt;&lt;em&gt;&lt;strong&gt;Target Entropy&lt;/strong&gt; : Teacher model의 Output의 ‘정보 불안정성(unstable)’을 의미한다. 이 값이 높을 수록 Teacher model이 뱉는 Softlabel이 일관되지 않고 중구난방으로 값이 튄다는 것을 의미한다. &lt;strong&gt;KL divergence&lt;/strong&gt; : Student Model Output과 Teacher Model Output의 분포 차이도를 의미한다. 이 값이 0에 가까울 수록 Student와 Teacher가 같은 feature를 추출한다고 할 수 있고 이렇게 되면 Model은 더 이상 새로운 Feature를 학습 할 수 없고 해당 결과에 Dominate된다고 간주한다.&lt;/em&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot;&gt;
+    &lt;img src=&quot;/assets/img/paperreview/dino1_12.png&quot; width=&quot;70%&quot; /&gt;
+    &lt;em&gt;&lt;b&gt;Target Entropy&lt;/b&gt; : Teacher model의 Output의 &apos;정보 불안정성(unstable)&apos;을 의미한다. 이 값이 높을 수록 Teacher model이 뱉는 Softlabel이 일관되지 않고 중구난방으로 값이 튄다는 것을 의미한다. 
+    &lt;br /&gt;
+    &lt;b&gt;KL divergence&lt;/b&gt; : Student Model Output과 Teacher Model Output의 분포 차이도를 의미한다. 이 값이 0에 가까울 수록 Student와 Teacher가 같은 feature를 추출한다고 할 수 있고 이렇게 되면 Model은 더 이상 새로운 Feature를 학습 할 수 없고 해당 결과에 Dominate된다고 간주한다.&lt;/em&gt;
+&lt;/p&gt;
+
+&lt;p&gt;위 figure는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Centering&lt;/code&gt; 과 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Sharpening&lt;/code&gt;을 각각 적용하였을 때 and 함께 적용하였을 때에 SSL에서 Collapse가 일어나는 주요요인을 분석한 비교 실험에 관한 figure입니다. 자세한 설명은 캡션에 소개되어 있습니다.&lt;/p&gt;
 
 &lt;blockquote&gt;
   &lt;p&gt;결론은 둘 다 사용해야 Model Collapse를 방지하는것에 효과적이라는 말&lt;/p&gt;
@@ -1320,209 +2249,6 @@ DINO에서는 Teacher output의 &lt;code class=&quot;language-plaintext highligh
         
         
         <category>paper review</category>
-        
-      </item>
-    
-      <item>
-        <title>The Illustrated SimCLR Framework</title>
-        <description>&lt;p&gt;In recent years, &lt;a href=&quot;https://amitness.com/2020/02/illustrated-self-supervised-learning/&quot;&gt;numerous self-supervised learning methods&lt;/a&gt; have been proposed for learning image representations, each getting better than the previous. But, their performance was still below the supervised counterparts.&lt;/p&gt;
-
-&lt;p&gt;This changed when &lt;strong&gt;Chen et. al&lt;/strong&gt; proposed a new framework in their research paper “&lt;a href=&quot;https://arxiv.org/abs/2002.05709&quot;&gt;SimCLR: A Simple Framework for Contrastive Learning of Visual Representations&lt;/a&gt;”. The SimCLR paper not only improves upon the previous state-of-the-art self-supervised learning methods but also beats the supervised learning method on ImageNet classification when scaling up the architecture.&lt;/p&gt;
-
-&lt;p&gt;In this article, I will explain the key ideas of the framework proposed in the research paper using diagrams.&lt;/p&gt;
-
-&lt;h2 id=&quot;the-nostalgic-intuition&quot;&gt;The Nostalgic Intuition&lt;/h2&gt;
-&lt;p&gt;As a kid, I remember we had to solve such puzzles in our textbook.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/contrastive-find-a-pair.png&quot; alt=&quot;Find a Pair Exercise&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;The way a child would solve it is by looking at the picture of the animal on the left side, know its a cat, then search for a cat on the right side.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/contrastive-puzzle.gif&quot; alt=&quot;Child Matching Animal Pairs&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;“Such exercises were prepared for the child to be able to recognize an object and contrast that to other objects. Can we similarly teach machines?”&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;It turns out that we can through a technique called &lt;strong&gt;Contrastive Learning&lt;/strong&gt;. It attempts to teach machines to distinguish between similar and dissimilar things.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/simclr-contrastive-learning.png&quot; alt=&quot;Contrastive Learning Block&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;problem-formulation-for-machines&quot;&gt;Problem Formulation for Machines&lt;/h2&gt;
-&lt;p&gt;To model the above exercise for a machine instead of a child, we see that we require 3 things:&lt;/p&gt;
-
-&lt;h3 id=&quot;1-examples-of-similar-and-dissimilar-images&quot;&gt;1. Examples of similar and dissimilar images&lt;/h3&gt;
-&lt;p&gt;We would require example pairs of images that are similar and images that are different for training a model.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/contrastive-need-one.png&quot; alt=&quot;Pair of similar and dissimilar images&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;The supervised school of thought would require a human to manually annotate such pairs. To automate this, we could leverage &lt;a href=&quot;https://amitness.com/2020/02/illustrated-self-supervised-learning/&quot;&gt;self-supervised learning&lt;/a&gt;. But how do we formulate it?&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/contrastive-supervised-approach.png&quot; alt=&quot;Manually Labeling pairs of Images&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/contrastive-self-supervised-approach.png&quot; alt=&quot;Self-supervised Approach to Labeling Images&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;2-ability-to-know-what-an-image-represents&quot;&gt;2. Ability to know what an image represents&lt;/h3&gt;
-&lt;p&gt;We need some mechanism to get representations that allow the machine to understand an image.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/image-representation.png&quot; alt=&quot;Converting Image to Representations&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;3-ability-to-quantify-if-two-images-are-similar&quot;&gt;3. Ability to quantify if two images are similar&lt;/h3&gt;
-&lt;p&gt;We need some mechanism to compute the similarity of two images.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/image-similarity.png&quot; alt=&quot;Computing Similarity between Images&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;the-simclr-framework-approach&quot;&gt;The SimCLR Framework Approach&lt;/h2&gt;
-
-&lt;p&gt;The paper proposes a framework called “&lt;strong&gt;SimCLR&lt;/strong&gt;” for modeling the above problem in a self-supervised manner. It blends the concept of &lt;em&gt;Contrastive Learning&lt;/em&gt; with a few novel ideas to learn visual representations without human supervision.&lt;/p&gt;
-
-&lt;h2 id=&quot;simclr-framework&quot;&gt;SimCLR Framework&lt;/h2&gt;
-&lt;p&gt;The idea of SimCLR framework is very simple. An image is taken and random transformations are applied to it to get a pair of two augmented images \(x_i\) and \(x_j\). Each image in that pair is passed through an encoder to get representations. Then a non-linear fully connected layer is applied to get representations z. The task is to maximize the similarity between these two representations \(z_i\) and \(z_j\) for the same image.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/simclr-general-architecture.png&quot; alt=&quot;General Architecture of the SimCLR Framework&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;step-by-step-example&quot;&gt;Step by Step Example&lt;/h2&gt;
-&lt;p&gt;Let’s explore the various components of the SimCLR framework with an example. Suppose we have a training corpus of millions of unlabeled images.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/simclr-raw-data.png&quot; alt=&quot;Corpus of millions of images&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;1-self-supervised-formulation-data-augmentation&quot;&gt;&lt;strong&gt;1. Self-supervised Formulation&lt;/strong&gt; [Data Augmentation]&lt;/h3&gt;
-&lt;p&gt;First, we generate batches of size N from the raw images. Let’s take a batch of size N = 2 for simplicity. In the paper, they use a large batch size of 8192.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/simclr-single-batch.png&quot; alt=&quot;A single batch of images&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;The paper defines a random transformation function T that takes an image and applies a combination of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;random (crop + flip + color jitter + grayscale)&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/simclr-random-transformation-function.gif&quot; alt=&quot;Random Augmentation on Image&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;For each image in this batch, a random transformation function is applied to get a pair of 2 images. Thus, for a batch size of 2, we get 2*N = 2*2 = 4 total images.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/simclr-batch-data-preparation.png&quot; alt=&quot;Augmenting images in a batch for SimCLR&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;2-getting-representations-base-encoder&quot;&gt;2. Getting Representations [Base Encoder]&lt;/h3&gt;
-
-&lt;p&gt;Each augmented image in a pair is passed through an encoder to get image representations. The encoder used is generic and replaceable with other architectures. The two encoders shown below have shared weights and we get vectors \(h_i\) and \(h_j\).&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/simclr-encoder-part.png&quot; alt=&quot;Encoder part of SimCLR&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;In the paper, the authors used &lt;a href=&quot;https://arxiv.org/abs/1512.03385&quot;&gt;ResNet-50&lt;/a&gt; architecture as the ConvNet encoder. The output is a 2048-dimensional vector h.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/simclr-paper-encoder.png&quot; alt=&quot;ResNet-50 as encoder in SimCLR&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;3-projection-head&quot;&gt;3. Projection Head&lt;/h3&gt;
-&lt;p&gt;The representations \(h_i\) and \(h_j\) of the two augmented images are then passed through a series of non-linear &lt;strong&gt;Dense -&amp;gt; Relu -&amp;gt; Dense&lt;/strong&gt; layers to apply non-linear transformation and project it into a representation \(z_i\) and \(z_j\). This is denoted by \(g(.)\) in the paper and called projection head.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/simclr-projection-head-component.png&quot; alt=&quot;Projection Head Component of SimCLR&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;4-tuning-model-bringing-similar-closer&quot;&gt;4. Tuning Model: [Bringing similar closer]&lt;/h3&gt;
-&lt;p&gt;Thus, for each augmented image in the batch, we get embedding vectors \(z\) for it.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/simclr-projection-vectors.png&quot; alt=&quot;Projecting image to embedding vectors&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;From these embedding, we calculate the loss in following steps:&lt;/p&gt;
-
-&lt;h4 id=&quot;a-calculation-of-cosine-similarity&quot;&gt;a. Calculation of Cosine Similarity&lt;/h4&gt;
-
-&lt;p&gt;Now, the similarity between two augmented versions of an image is calculated using cosine similarity. For two augmented images \(x_i\) and \(x_j\), the cosine similarity is calculated on its projected representations \(z_i\) and \(z_j\).&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/simclr-cosine-similarity.png&quot; alt=&quot;Cosine similarity between image embeddings&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-\[s_{i,j} = \frac{ \color{#ff7070}{z_{i}^{T}z_{j}} }{(\tau ||\color{#ff7070}{z_{i}}|| ||\color{#ff7070}{z_{j}}||)}\]
-
-&lt;p&gt;where&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;\(\tau\) is the adjustable temperature parameter. It can scale the inputs and widen the range &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;[-1, 1]&lt;/code&gt; of cosine similarity&lt;/li&gt;
-  &lt;li&gt;\(\lVert z_{i} \rVert\) is the norm of the vector.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;The pairwise cosine similarity between each augmented image in a batch is calculated using the above formula. As shown in the figure, in an ideal case, the similarities between augmented images of cats will be high while the similarity between cat and elephant images will be lower.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/simclr-pairwise-similarity.png&quot; alt=&quot;Pairwise cosine similarity between 4 images&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;h4 id=&quot;b-loss-calculation&quot;&gt;b. Loss Calculation&lt;/h4&gt;
-&lt;p&gt;SimCLR uses a contrastive loss called “&lt;strong&gt;NT-Xent loss&lt;/strong&gt;” (&lt;strong&gt;Normalized Temperature-Scaled Cross-Entropy Loss&lt;/strong&gt;). Let see intuitively how it works.&lt;/p&gt;
-
-&lt;p&gt;First, the augmented pairs in the batch are taken one by one.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/simclr-augmented-pairs-batch.png&quot; alt=&quot;Example of a single batch in SimCLR&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Next, we apply the softmax function to get the probability of these two images being similar.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/simclr-softmax-calculation.png&quot; alt=&quot;Softmax Calculation on Image Similarities&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;This softmax calculation is equivalent to getting the probability of the second augmented cat image being the most similar to the first cat image in the pair. Here, all remaining images in the batch are sampled as a dissimilar image (negative pair). Thus, we don’t need specialized architecture, memory bank or queue need by previous approaches like &lt;a href=&quot;https://arxiv.org/pdf/1805.01978.pdf&quot;&gt;InstDisc&lt;/a&gt;, &lt;a href=&quot;https://arxiv.org/abs/1911.05722&quot;&gt;MoCo&lt;/a&gt; or &lt;a href=&quot;https://amitness.com/2020/03/illustrated-pirl/&quot;&gt;PIRL&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/simclr-softmax-interpretation.png&quot; alt=&quot;Interpretation of Softmax Function&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Then, the loss is calculated for a pair by taking the negative of the log of the above calculation. This formulation is the Noise Contrastive Estimation(NCE) Loss.&lt;/p&gt;
-
-\[l(i, j) = -log\frac{exp(s_{i, j})}{ \sum_{k=1}^{2N} l_{[k!= i]} exp(s_{i, k})}\]
-
-&lt;p&gt;&lt;img src=&quot;/images/simclr-softmax-loss.png&quot; alt=&quot;Calculation of Loss from softmax&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;We calculate the loss for the same pair a second time as well where the positions of the images are interchanged.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/simclr-softmax-loss-inverted.png&quot; alt=&quot;Calculation of loss for exchanged pairs of images&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Finally, we compute loss over all the pairs in the batch of size N=2 and take an average.&lt;/p&gt;
-
-\[L = \frac{1}{ 2\color{#2196f3}{N} } \sum_{k=1}^{N} [l(2k-1, 2k) + l(2k, 2k-1)]\]
-
-&lt;p&gt;&lt;img src=&quot;/images/simclr-total-loss.png&quot; alt=&quot;Total loss in SimCLR&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Based on the loss, the encoder and projection head representations improves over time and the representations obtained place similar images closer in the space.&lt;/p&gt;
-
-&lt;h2 id=&quot;downstream-tasks&quot;&gt;Downstream Tasks&lt;/h2&gt;
-&lt;p&gt;Once the SimCLR model is trained on the contrastive learning task, it can be used for transfer learning. For this, the representations from the encoder are used instead of representations obtained from the projection head. These representations can be used for downstream tasks like  ImageNet Classification.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/simclr-downstream.png&quot; alt=&quot;Using SimCLR for downstream tasks&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;objective-results&quot;&gt;Objective Results&lt;/h2&gt;
-&lt;p&gt;SimCLR outperformed previous self-supervised methods on ImageNet. The below image shows the top-1 accuracy of linear classifiers trained on representations learned with different self-supervised methods on ImageNet. The gray cross is supervised ResNet50 and SimCLR is shown in bold.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/simclr-performance.png&quot; alt=&quot;Performance of SimCLR on ImageNet&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
-
-&lt;p class=&quot;text-center&quot;&gt;Source: &lt;a href=&quot;https://arxiv.org/abs/2002.05709&quot;&gt;SimCLR paper&lt;/a&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;On ImageNet &lt;a href=&quot;http://image-net.org/challenges/LSVRC/2012/&quot;&gt;ILSVRC-2012&lt;/a&gt;, it achieves 76.5% top-1 accuracy which is 7% improvement over previous SOTA self-supervised method &lt;a href=&quot;https://arxiv.org/abs/1905.09272&quot;&gt;Contrastive Predictive Coding&lt;/a&gt; and on-par with supervised ResNet50.&lt;/li&gt;
-  &lt;li&gt;When trained on 1% of labels, it achieves 85.8% top-5 accuracy outperforming AlexNet with 100x fewer labels&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;simclr-code&quot;&gt;SimCLR Code&lt;/h2&gt;
-&lt;p&gt;The official implementation of SimCLR in Tensorflow by the paper authors is available on &lt;a href=&quot;https://github.com/google-research/simclr&quot;&gt;GitHub&lt;/a&gt;. They also provide &lt;a href=&quot;https://github.com/google-research/simclr#pre-trained-models-for-simclrv1&quot;&gt;pretrained models&lt;/a&gt; for 1x, 2x, and 3x variants of the ResNet50 architectures using Tensorflow Hub.&lt;/p&gt;
-
-&lt;p&gt;There are various unofficial SimCLR PyTorch implementations available that have been tested on small datasets like &lt;a href=&quot;https://github.com/leftthomas/SimCLR&quot;&gt;CIFAR-10&lt;/a&gt; and &lt;a href=&quot;https://github.com/Spijkervet/SimCLR&quot;&gt;STL-10&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
-&lt;p&gt;Thus, SimCLR provides a strong framework for doing further research in this direction and improve the state of self-supervised learning for Computer Vision.&lt;/p&gt;
-
-&lt;h2 id=&quot;citation-info-bibtex&quot;&gt;Citation Info (BibTex)&lt;/h2&gt;
-&lt;p&gt;If you found this blog post useful, please consider citing it as:&lt;/p&gt;
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{chaudhary2020simclr,
-  title   = {The Illustrated SimCLR Framework},
-  author  = {Amit Chaudhary},
-  year    = 2020,
-  note    = {\url{https://amitness.com/2020/03/illustrated-simclr}}
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://arxiv.org/abs/2002.05709&quot;&gt;“A Simple Framework for Contrastive Learning of Visual Representations”&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://arxiv.org/pdf/1706.04599.pdf&quot;&gt;“On Calibration of Modern Neural Networks”&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://arxiv.org/pdf/1503.02531.pdf&quot;&gt;“Distilling the Knowledge in a Neural Network”&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://docs.google.com/presentation/d/1ccddJFD_j3p3h0TCqSV9ajSi2y1yOfh0-lJoK29ircs/edit#slide=id.g8c1b8d6efd_0_1&quot;&gt;“SimCLR Slides, Google Brain Team”&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-</description>
-        <pubDate>Wed, 04 Mar 2020 23:00:30 +0900</pubDate>
-        <link>http://localhost:4000/blog/sclr</link>
-        <guid isPermaLink="true">http://localhost:4000/blog/sclr</guid>
-        
-        <category></category>
-        
-        
-        <category>self-supervised-learning</category>
         
       </item>
     
