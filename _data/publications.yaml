@@ -1,0 +1,20 @@
+papers:
+  - title: "FALCON: Frequency Adjoint Link with CONtinuous density mask for fast single image dehazing"
+    year: "2024"
+    authors: "Donghyun Kim, <b><u>Seil Kang</u></b>, Seong Jae Hwang"
+    venue: "Preprint Under Review"
+    paper_pdf: ""
+    code: ""
+    selected: y
+  - title: "WoLF: Wide-scope Large Language Model Framework for CXR Understanding"
+    authors: "<b><u>Seil Kang</u></b>, Donghyun Kim, Junhyeok Kim, Hyo Kyung Lee, Seong Jae Hwang"
+    venue: "Preprint Under Review"
+    paper_pdf: "https://arxiv.org/abs/2403.15456"
+    code: ""
+    selected: y
+  - title: "CoBra: Complementary Branch Fusing Class and Semantic Knowledge for Robust Weakly Supervised Semantic Segmentation"
+    authors: "Woojung Han, <b><u>Seil Kang</u></b>, Kyobin Choo, Seong Jae Hwang"
+    venue: "Preprint Under Review"
+    paper_pdf: "https://arxiv.org/abs/2403.08801"
+    code: ""
+    selected: y
