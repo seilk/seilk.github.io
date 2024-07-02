@@ -3,7 +3,7 @@ papers:
     year: "2024"
     authors: "Donghyun Kim, <b><u>Seil Kang</u></b>, Seong Jae Hwang"
     venue: "Preprint Under Review"
-    paper_pdf: ""
+    paper_pdf: "https://arxiv.org/abs/2407.00972"
     code: ""
     selected: y
   - title: "WoLF: Wide-scope Large Language Model Framework for CXR Understanding"
