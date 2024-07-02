@@ -3,8 +3,8 @@ layout: default
 ---
 
 <head>
-	<title>My HTML Page</title>
-	<style>
+  <title>My HTML Page</title>
+  <style>
 		.no-margin {
 			margin: 0;
 			white-space: nowrap;
@@ -14,11 +14,11 @@ layout: default
 <!-- ========== About ========== -->
 <div class="docs-section" id="about">
   <h5>About</h5>
-  Hello, I’m Seil Kang. 
-  I am a computer science Ph.D. student at Yonsei University, advised by Prof. <a href="https://micv-yonsei.github.io/author/seong-jae-hwang/">Seong Jae Hwang</a> at 
-  <a href="https://micv-yonsei.github.io">MICV</a> (Medical Imaging and Computer Vision). 
+  Hello, I’m Seil Kang.
+  I am a computer science Ph.D. student at Yonsei University, advised by Prof. <a href="https://micv-yonsei.github.io/author/seong-jae-hwang/">Seong Jae Hwang</a> at
+  <a href="https://micv-yonsei.github.io">MICV</a> (Medical Imaging and Computer Vision).
   Before this, I obtained my bachler’s degree (with honor) at Yonsei University.
-  <br>My research interests include <b>Vision and Language Models (VLMs), Large Vision Language Models (LVLMs), with an additional focus on Medical Imaging applications.</b> 
+  <br>My research interests include <b>Vision and Language Models (VLMs), Large Vision Language Models (LVLMs), with an additional focus on Medical Imaging applications.</b>
   <br>Please feel free to reach out to me via email!
 </div>
 
@@ -27,16 +27,22 @@ layout: default
   <h5>News</h5>
   <div class="row no-gutters">
     <div class="col-12 col-md-12 text-md-left">
+      <b class="bbold" style="color:#fa8072;">Jul 2024</b>&nbsp;&nbsp;&nbsp;&nbsp;
+      Our <a href="https://arxiv.org/abs/2407.00972">Falcon</a> papers are released!
+    </div>
+  </div>
+  <div class="row no-gutters">
+    <div class="col-12 col-md-12 text-md-left">
       <b class="bbold" style="color:#fa8072;">Mar 2024</b>&nbsp;&nbsp;&nbsp;&nbsp;
-      Our <a href="https://arxiv.org/abs/2403.15456">WoLF</a> papers are released! 
-      </div>
-      </div>
-        <div class="row no-gutters">
-          <div class="col-12 col-md-12 text-md-left">
-            <b class="bbold" style="color:#fa8072;">Mar 2024</b>&nbsp;&nbsp;&nbsp;&nbsp;
-            Our <a href="https://arxiv.org/abs/2403.08801">Cobra</a> paper is released! 
-          </div>
-        </div>
+      Our <a href="https://arxiv.org/abs/2403.15456">WoLF</a> papers are released!
+    </div>
+  </div>
+  <div class="row no-gutters">
+    <div class="col-12 col-md-12 text-md-left">
+      <b class="bbold" style="color:#fa8072;">Mar 2024</b>&nbsp;&nbsp;&nbsp;&nbsp;
+      Our <a href="https://arxiv.org/abs/2403.08801">Cobra</a> paper is released!
+    </div>
+  </div>
   <div class="row no-gutters">
     <div class="col-12 col-md-12 text-md-left">
       <b class="bbold" style="color:#fa8072;">Nov 2023</b>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -55,19 +61,19 @@ layout: default
 <!-- ========== Education ========== -->
 <div class="docs-section" id="education">
   <h5>Education</h5>
-        <div class="paper">
-          <p class="title"><b>Yonsei University<b style="float:right;">Sep. 2024 - Present</b></b></p>
-          
-          <p>Ph.D. in Computer Science (Advisors: <a href="https://wellecks.com/">Seong Jae Hwang</a>)</p>
-          <p></p>
-        </div>
+  <div class="paper">
+    <p class="title"><b>Yonsei University<b style="float:right;">Sep. 2024 - Present</b></b></p>
 
-        <div class="paper">
-          <p class="title"><b>Yonsei University<b style="float:right;">Mar. 2020 - Feb. 2023</b></b></p>
-          
-          <p>B.S. in Chemical Engineering</p>
-          <p></p>
-        </div>
+    <p>Ph.D. in Computer Science (Advisors: <a href="https://wellecks.com/">Seong Jae Hwang</a>)</p>
+    <p></p>
+  </div>
+
+  <div class="paper">
+    <p class="title"><b>Yonsei University<b style="float:right;">Mar. 2020 - Feb. 2023</b></b></p>
+
+    <p>B.S. in Chemical Engineering</p>
+    <p></p>
+  </div>
 </div>
 
 <!-- ========== PUBLICATIONS ========== -->
@@ -75,66 +81,66 @@ layout: default
   <h5>Publications</h5>
 
   <!-- <p>Most recent publications on <a href="{{ site.data.main_info.google_scholar }}" target="_blank">Google Scholar</a>.<br/> -->
-  </p>
+</p>
 
-  <!-- <ul class="tab-nav">
+<!-- <ul class="tab-nav">
     <li><div class="button active" data-ref="#papers-selected">Selected</div></li>
     <li><div class="button" data-ref="#papers-all">All</div></li>
   </ul> -->
 
-  <div class="tab-content">
-    <div class="tab-pane active" id="papers-selected">
-      {% assign selected_papers = site.data.publications.papers | where: "selected", "y" %}
-      {% for paper in selected_papers %}
-        <div class="paper">
-          <div class="row">
-            <!--
+<div class="tab-content">
+  <div class="tab-pane active" id="papers-selected">
+    {% assign selected_papers = site.data.publications.papers | where: "selected", "y" %}
+    {% for paper in selected_papers %}
+    <div class="paper">
+      <div class="row">
+        <!--
             <div class="four columns">
               <div class="figure">
                 <img src="{{ paper.image }}" width="100%">
               </div>
             </div>
             -->
-            <div class="twelve columns">
-              {% if paper.year %}
-                <p><h5>{{ paper.year }}</h5><hr /></p>
-              {% endif %}
-              <p class="title"><b>{{ paper.title }}</b></p>
-              <p>{{ paper.authors }}</p>
-              <p><i>{{ paper.venue }}</i></p>
-              <div class="paper-buttons">
-                {% if paper.paper_pdf %}
-                  <a class="button" href="{{ paper.paper_pdf }}" target="_blank">Paper</a>
-                {% endif %}
+        <div class="twelve columns">
+          {% if paper.year %}
+          <p><h5>{{ paper.year }}</h5><hr /></p>
+          {% endif %}
+          <p class="title"><b>{{ paper.title }}</b></p>
+          <p>{{ paper.authors }}</p>
+          <p><i>{{ paper.venue }}</i></p>
+          <div class="paper-buttons">
+            {% if paper.paper_pdf %}
+            <a class="button" href="{{ paper.paper_pdf }}" target="_blank">Paper</a>
+            {% endif %}
 
-                {% if paper.poster %}
-                  <a class="button" href="{{ paper.poster | prepend: site.baseurl }}" target="_blank">Poster</a>
-                {% endif %}
+            {% if paper.poster %}
+            <a class="button" href="{{ paper.poster | prepend: site.baseurl }}" target="_blank">Poster</a>
+            {% endif %}
 
-                {% if paper.video %}
-                  <a class="button" href="{{ paper.video }}" target="_blank">Video</a>
-                {% endif %}
+            {% if paper.video %}
+            <a class="button" href="{{ paper.video }}" target="_blank">Video</a>
+            {% endif %}
 
-                {% if paper.code %}
-                  <a class="button" href="{{ paper.code }}" target="_blank">Code</a>
-                {% endif %}
-                
-                {% if paper.slides %}
-                  <a class="button" href="{{ paper.slides | prepend: site.baseurl }}" target="_blank">Slides</a>
-                {% endif %}
-                
-                {% if paper.twitter %}
-                  <a class="button" href="{{ paper.twitter }}" target="_blank">Twitter</a>
-                {% endif %}
-              </div>
-            </div>
-          </div>       
+            {% if paper.code %}
+            <a class="button" href="{{ paper.code }}" target="_blank">Code</a>
+            {% endif %}
+
+            {% if paper.slides %}
+            <a class="button" href="{{ paper.slides | prepend: site.baseurl }}" target="_blank">Slides</a>
+            {% endif %}
+
+            {% if paper.twitter %}
+            <a class="button" href="{{ paper.twitter }}" target="_blank">Twitter</a>
+            {% endif %}
+          </div>
         </div>
-      {% endfor %}
-      <h6><b><i>( * indicates equal contribution )</i></b></h6>
+      </div>
     </div>
-    
-    <!-- <div class="tab-pane" id="papers-all">
+    {% endfor %}
+    <h6><b><i>( * indicates equal contribution )</i></b></h6>
+  </div>
+
+  <!-- <div class="tab-pane" id="papers-all">
       {% for paper in site.data.publications.papers %}
         <div class="paper">
           <div class="row">
@@ -173,7 +179,7 @@ layout: default
         </div>
     {% endfor %}
     </div> -->
-    
+
 </div>
 
 <!-- ========== PROJECTS ========== -->
@@ -262,18 +268,18 @@ layout: default
     <li>
       {% if exp.category == "work" %}
       <div class="direction-l">
-      {% else %}
-      <div class="direction-r">
-      {% endif %}
-        <div class="flag-wrapper">
-          <span class="flag">{{ exp.place }}</span>
-          <span class="time-wrapper"><span class="time">{{ exp.time }}</span></span>
+        {% else %}
+        <div class="direction-r">
+          {% endif %}
+          <div class="flag-wrapper">
+            <span class="flag">{{ exp.place }}</span>
+            <span class="time-wrapper"><span class="time">{{ exp.time }}</span></span>
+          </div>
+          <div class="desc"><b>{{ exp.title }}</b> <br /> {{ exp.subtitle }}</div>
         </div>
-        <div class="desc"><b>{{ exp.title }}</b> <br/> {{ exp.subtitle }}</div>
-      </div>
-    </li>
-    {% endfor %}
-  </ul>
-</div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
 
 </div>
